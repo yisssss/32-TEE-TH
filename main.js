@@ -251,21 +251,42 @@ window.addEventListener("load", () => {
             // 10초 후 비디오로 복귀하는 함수
             const resetToVideo = () => {
                 if (isCompleted) return; // 완료된 경우 복귀하지 않음
-                
+
+                console.log('🔄 resetToVideo 호출됨');
+
                 // 타이머 정리
                 if (resetToVideoTimeout) {
                     clearTimeout(resetToVideoTimeout);
                     resetToVideoTimeout = null;
                 }
-                
+
                 // 상태 리셋
                 videoClicked = false;
-                
+                loadingProgress = 0;
+                loadingBiteCount = 0;
+                currentBiteIndex = -1;
+                isPressing = false;
+
+                // percentage 표시 리셋
+                if (loadingPercentageCenter) {
+                    loadingPercentageCenter.textContent = '0';
+                }
+
                 // shader plane 숨기기
                 if (loadingImageContainer) {
                     loadingImageContainer.style.display = 'none';
                 }
-                
+
+                // 배경 이미지 숨기기
+                if (loadingBackgroundContainer) {
+                    loadingBackgroundContainer.style.display = 'none';
+                }
+
+                // 비디오 컨테이너 다시 표시
+                if (loadingVideoContainer) {
+                    loadingVideoContainer.style.display = 'block';
+                }
+
                 // CLICK TO BITE 다시 표시하고 percentage 숨기기
                 if (loadingInstructionGrid) {
                     loadingInstructionGrid.style.display = 'grid';
@@ -273,8 +294,9 @@ window.addEventListener("load", () => {
                 if (loadingPercentageGrid) {
                     loadingPercentageGrid.style.display = 'none';
                 }
-                
+
                 // 비디오 재생 재개
+                isShowingBackground = false;
                 playVideo(currentVideoIndex);
             };
             
@@ -618,6 +640,13 @@ window.addEventListener("load", () => {
     // 메인 페이지 시작
     function startMainPage() {
         console.log('🎬 startMainPage 호출됨!');
+
+        // 5분(300000ms) 후 자동 새로고침
+        setTimeout(() => {
+            console.log('⏰ 5분 경과 - 페이지 새로고침');
+            window.location.reload();
+        }, 300000);
+
         // 로딩 정리 함수
         function cleanupLoading() {
             console.log('🧹 cleanupLoading 시작!');
@@ -1083,30 +1112,33 @@ gsap.to(homeBackground, {
         const chapters = [
             {
                 chapter: 1,
-                titleLeft: 'BEWARE',
-                titleCenter: 'THE',
-                titleRight: 'SMOOTH',
+                titleLeft: 'THE',
+                titleCenter: 'SMOOTH',
+                titleRight: 'WORLD',
                 number: '1',
-                textEn: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent fringilla erat sit amet efficitur suscipit.',
-                textKo: '국가는 노인과 청소년의 복지향상을 위한 정책을 실시할 의무를 진다. 언론・출판에 대한 허가나 검열과 집회・결사에 대한 인허가지 아니한다.'
+                subTitle: '매끈한 세상',
+                textEn: 'How does food, intentionally stripped of unpleasant experiences—such as being tough, bitter, or sour—in order to be produced more efficiently and cheaply, or to appeal to a wider audience, kill our senses?',
+                textKo: '보다 효율적이고 저렴하게 생산되기 위해, 혹은 보다 많은 이에게 매력적이기 위해 유쾌하지 않은 경험— 질기거나, 쓰고 신맛이 나는—이 의도적으로 제거된 음식은 어떻게 우리의 감각을 살해하는가?'
             },
             {
                 chapter: 2,
-                titleLeft: 'SEEK',
-                titleCenter: 'THE',
-                titleRight: 'ROUGH',
+                titleLeft: 'THE',
+                titleCenter: 'PURE',
+                titleRight: 'FANTASY',
                 number: '2',
-                textEn: 'Chapter 2 content goes here. This is example text for the second chapter.',
-                textKo: '두 번째 챕터의 한글 내용이 여기에 들어갑니다. 이것은 예시 텍스트입니다.'
+                subTitle: '순결한 환상',
+                textEn: 'We eat what we kill. Everyone does, without exception. Smooth food instills a pure fantasy.',
+                textKo: '우리는 우리가 죽인 것을 먹는다. 예외 없이 모두가 그렇다. 매끈한 음식은 순결한 환상을 심어준다.'
             },
             {
                 chapter: 3,
-                titleLeft: 'EMBRACE',
-                titleCenter: 'THE',
-                titleRight: 'TEXTURE',
+                titleLeft: 'THE',
+                titleCenter: 'ATROPHYING',
+                titleRight: 'BODY',
                 number: '3',
-                textEn: 'Chapter 3 content goes here. This is example text for the third chapter.',
-                textKo: '세 번째 챕터의 한글 내용이 여기에 들어갑니다. 이것은 예시 텍스트입니다.'
+                subTitle: '퇴화하는 몸',
+                textEn: 'We can only find primordial sensations through what we actually possess. There are experiences only possible through non-smooth food.',
+                textKo: '우린 우리가 실제로 가진 것을 통해서만원초의 감각을 찾을 수 있다. 매끄럽지 않은 음식을 통해서만 가능한 경험이 있다.'
             }
         ];
 
@@ -1138,8 +1170,8 @@ gsap.to(homeBackground, {
             titleCenter.textContent = chapter.titleCenter;
             titleRight.textContent = chapter.titleRight;
 
-            // CH 표기 업데이트
-            chapterDisplay.textContent = `CH ${chapter.chapter}`;
+            // 부제 업데이트
+            chapterDisplay.textContent = chapter.subTitle;
 
             // Home background 이미지 업데이트 (챕터에 따라 story1.png, story2.png, story3.png)
             const homeBackground = document.querySelector('.home-background');
@@ -1269,12 +1301,9 @@ gsap.fromTo(homeBackground,
                 type: '건조저장육류',
                 weight: '1.27kg',
                 calories: '4,435kcal',
-                description: `소고기의 살코기만을 사용,
-수분을 4% 미만으로 제거해 만든 육포.
-석육은 70kg/cm² 이상의 압력을 가해
-조직을 재결합시킨 고밀도 압축체다.
-씹는 행위의 잊힌 원초적 질감을
-회복하기 위해 고안된 비정형의 덩어리.`,
+                description: `소고기의 살코기만을 사용, 수분을 4% 미만으로 제거해 만든 육포.
+석육은 70kg/cm² 이상의 압력을 가해 조직을 재결합시킨 고밀도 압축체다.
+씹는 행위의 잊힌 원초적 질감을 회복하기 위해 고안된 비정형의 덩어리.`,
                 image: 'assets/images/product1.jpg',
                 specs: {
                     hardness: '95 Shore (A)',
@@ -1301,10 +1330,9 @@ gsap.fromTo(homeBackground,
                 type: '곡물 가공품',
                 weight: '1.5kg',
                 calories: '3,800kcal',
-                description: `곡물의 외피와 숯 가루,
-그리고 강한 섬유질의 나무껍질을 혼합해 만든 빵. 유기물을 재료로 압력을 가해 만든 고밀도 압축 성형체다. 완성된
-검은 덩어리는 일반적인 빵의 다공성
-구조와 달리 촘촘하다.`,
+                description: `곡물의 외피와 숯 가루, 그리고 강한 섬유질의 나무껍질을 혼합해 만든 빵.
+                유기물을 재료로 압력을 가해 만든 고밀도 압축 성형체다. 완성된 검은 덩어리는
+                일반적인 빵의 다공성 구조와 달리 촘촘하다.`,
                 image: 'assets/images/product2.jpg',
                 specs: {
                     hardness: '98 Shore (A)',
@@ -1331,11 +1359,10 @@ gsap.fromTo(homeBackground,
                 type: '건조저장육류',
                 weight: '0.5kg',
                 calories: '2,215kcal',
-                description: `돈육에서 순수한 힘줄 섬유를 추출하여,
-여러 가닥으로 엮고 고온으로 경화시켜 제작된 간식이다. 턱의 인장력과
-지속적인 저작 활동을 측정하기 위해
-설계된 도구. 완성된 식품은 밧줄과
-유사한 장력을 유지한다.`,
+                description: `돈육에서 순수한 힘줄 섬유를 추출하여, 여러 가닥으로 엮고
+                고온으로 경화시켜 제작된 간식이다. 턱의 인장력과
+                지속적인 저작 활동을 측정하기 위해 설계된 도구.
+                완성된 식품은 밧줄과 유사한 장력을 유지한다.`,
                 image: 'assets/images/product3.jpg',
                 specs: {
                     hardness: '99 Shore (A)',
@@ -1373,7 +1400,7 @@ gsap.fromTo(homeBackground,
                     <div class="product-name-en">${product.nameEn}</div>
                     <div class="product-name-ko">${product.nameKo} (${product.nameKoHanja})</div>
                     <div class="product-info-right">
-                        <div class="product-info-brief">${product.type} | ${product.weight} | ${product.calories}</div>
+                        <div class="product-info-brief">${product.type}  |  ${product.weight}  |  ${product.calories}</div>
                         <span class="product-toggle">+</span>
                     </div>
                 </div>
@@ -1430,7 +1457,8 @@ gsap.fromTo(homeBackground,
                                 </div>
                             `).join('')}
                             <p class="korean-body-text" style="margin-top: 1rem; font-size: 0.75rem;">
-                                1일 영양성분 기준치에 대한 비율(%)은 2,000kcal 기준이므로 개인 필요 열량에 따라 다를 수 있습니다.
+                                1일 영양성분 기준치에 대한 비율(%)은 2,000kcal 기준이므로
+                                개인 필요 열량에 따라 다를 수 있습니다.
                             </p>
                         </div>
                     </div>
@@ -1491,31 +1519,29 @@ gsap.fromTo(homeBackground,
                 } else {
                     // 열기
                     item.classList.add('active');
-                    
+
                     if (gsap) {
                         // 요소들 선택
                         const imageEl = contentEl.querySelector('.product-image');
                         const descEl = contentEl.querySelector('.product-description');
                         const specsEl = contentEl.querySelector('.product-specs');
                         const nutritionEl = contentEl.querySelector('.product-nutrition');
-                        
-                        // 초기 상태 설정
+
+                        // 초기 상태 설정 - opacity는 1로 유지
                         gsap.set([imageEl, descEl, specsEl, nutritionEl], {
-                            opacity: 0
+                            opacity: 1
                         });
-                        gsap.set(imageEl, { scale: 0.95 });
-                        gsap.set([descEl, specsEl, nutritionEl], { y: 20 });
-                        
+
                         // 자연스러운 높이 계산
                         gsap.set(contentEl, { height: 'auto', opacity: 1 });
                         const autoHeight = contentEl.offsetHeight;
-                        
-                        // 높이 애니메이션
-                        gsap.fromTo(contentEl, 
+
+                        // 높이 애니메이션만 실행 (위에서 아래로 내려오는 효과)
+                        gsap.fromTo(contentEl,
                             { height: 0 },
                             {
                                 height: autoHeight,
-                                duration: 0.6,
+                                duration: 0.4,
                                 ease: 'power2.inOut',
                                 onComplete: () => {
                                     gsap.set(contentEl, { height: 'auto' });
@@ -1528,40 +1554,6 @@ gsap.fromTo(homeBackground,
                                 }
                             }
                         );
-                        
-                        // 이미지 애니메이션 (fade-in + scale)
-                        gsap.to(imageEl, {
-                            opacity: 1,
-                            scale: 1,
-                            duration: 0.6,
-                            delay: 0.2,
-                            ease: 'power2.out'
-                        });
-                        
-                        // 텍스트 순차 애니메이션 (좌→중→우)
-                        gsap.to(descEl, {
-                            opacity: 1,
-                            y: 0,
-                            duration: 0.5,
-                            delay: 0.4,
-                            ease: 'power2.out'
-                        });
-                        
-                        gsap.to(specsEl, {
-                            opacity: 1,
-                            y: 0,
-                            duration: 0.5,
-                            delay: 0.5,
-                            ease: 'power2.out'
-                        });
-                        
-                        gsap.to(nutritionEl, {
-                            opacity: 1,
-                            y: 0,
-                            duration: 0.5,
-                            delay: 0.6,
-                            ease: 'power2.out'
-                        });
                     }
                 }
             });
@@ -1582,8 +1574,12 @@ gsap.fromTo(homeBackground,
         }
         
         // 친구 이름 목록 (역할&이름 형식으로 추가하세요)
+
         const credits = [
+            { role: 'Design', name: '박세정' },
             { role: 'Article', name: '이소담' },
+            { role: '', name: '박세정' },
+
             { role: 'Photo Model', name: '서효리' },
             { role: 'Help', name: '김수아' },
             { role: '', name: '이윤서' },
@@ -1591,15 +1587,26 @@ gsap.fromTo(homeBackground,
 
         ];
         
-        // 친구 이름들을 HTML로 생성
+        // HTML 생성 - 모든 name의 시작점을 동일하게 정렬
         credits.forEach(credit => {
-            const creditElement = document.createElement('p');
+            const creditLine = document.createElement('div');
+            creditLine.className = 'credit-line';
+
+            // role 컬럼 (있으면 표시, 없으면 빈 공간)
+            const roleSpan = document.createElement('span');
+            roleSpan.className = 'credit-role';
             if (credit.role && credit.role.trim() !== '') {
-                creditElement.innerHTML = `<strong>${credit.role}</strong> ${credit.name}`;
-            } else {
-                creditElement.textContent = credit.name;
+                roleSpan.innerHTML = `<strong>${credit.role}</strong>`;
             }
-            creditNames.appendChild(creditElement);
+
+            // name 컬럼
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'credit-name';
+            nameSpan.textContent = credit.name;
+
+            creditLine.appendChild(roleSpan);
+            creditLine.appendChild(nameSpan);
+            creditNames.appendChild(creditLine);
         });
         
         let isPanelVisible = false;
