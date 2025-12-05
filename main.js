@@ -651,6 +651,28 @@ window.addEventListener("load", () => {
 
             // HTML 기능 초기화 (스크롤 시스템 포함)
             initHTMLFeatures();
+
+            // 레이아웃 강제 리플로우 (브라우저가 레이아웃을 즉시 계산하도록)
+            if (pageContent) {
+                void pageContent.offsetHeight; // 리플로우 강제 실행
+            }
+
+            // 레이아웃이 안정화될 때까지 약간 대기 후 ScrollTrigger 새로고침
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    console.log('🔄 ScrollTrigger 새로고침 시작...');
+
+                    // ScrollTrigger 새로고침
+                    if (window.ScrollTrigger) {
+                        window.ScrollTrigger.refresh();
+                        console.log('✅ ScrollTrigger.refresh() 완료');
+                    }
+
+                    // 강제 리사이즈 이벤트 발생 (일부 요소들이 리사이즈에 반응하도록)
+                    window.dispatchEvent(new Event('resize'));
+                    console.log('✅ resize 이벤트 발생');
+                });
+            });
         }
         
         // 로딩 페이지 페이드아웃
