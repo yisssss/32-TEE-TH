@@ -1,0 +1,1332 @@
+:root {
+  --red: #ef0c0c;
+  --green: #17ef17;
+  --black: #2d0408;
+  --ham: #e88470;
+  --chips: #f2bb4e;
+  --cream: #ece0cb;
+}
+
+/* 한글 전용 폰트 */
+@font-face {
+  font-family: 'HYGothic';
+  src: url('assets/fonts/HY중고딕.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F;
+  /* 한글 유니코드 범위 */
+}
+
+/* 영문 전용 폰트 - Bold */
+@font-face {
+  font-family: 'NeueHaasDisplayBold';
+  src: url('assets/fonts/NeueHaasDisplayBold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0020-007E, U+00A0-00FF;
+  /* 영문/숫자/기호 유니코드 범위 */
+}
+
+/* 영문 전용 폰트 - Medium */
+@font-face {
+  font-family: 'NeueHaasDisplayMedium';
+  src: url('assets/fonts/NeueHaasDisplayMediu.ttf') format('truetype');
+  font-weight: medium;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0020-007E, U+00A0-00FF;
+}
+
+/* 영문 전용 폰트 - Roman */
+@font-face {
+  font-family: 'NeueHaasDisplayRoman';
+  src: url('assets/fonts/NeueHaasDisplayRoman.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0020-007E, U+00A0-00FF;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  background-size: auto;
+  /* 원본 크기로 타일 반복 */
+  overflow-y: scroll;
+  scroll-behavior: auto; /* 커스텀 smooth scroll이 처리 */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+body::-webkit-scrollbar {
+  display: none;
+}
+/* ✅ 전역 폰트 스타일 */
+body,
+#page-content {
+  /* 한글 기본 자간 (넓게) */
+  letter-spacing: -0.01em;
+  /* 줄간격 조정 */
+  line-height: 1.3;
+}
+
+/* ✅ 한글 본문 텍스트 공통 스타일 */
+.korean-body-text,
+.home-middle-center-bottom,
+.section-item p[lang="ko"],
+p:lang(ko) {
+  font-family: 'HYGothic', sans-serif;
+  font-size: 1.3rem;
+  line-height: 2rem;
+  letter-spacing: -0.05em;
+  transform: scaleX(0.97);
+  -webkit-text-stroke-width: 0.3px;
+}
+
+/* ✅ 영문 자간 조정 (더 좁게) */
+body *:lang(en),
+#page-content *:lang(en) {
+  letter-spacing: -0.04em;
+}
+
+/* ✅ Neue Haas Display 폰트 스타일 */
+.title-item {
+  /* 영문 자간 조정 (타이틀은 더 좁게) */
+  letter-spacing: -0.02em;
+  transform: scaleX(0.97);
+}
+
+/* ✅ Neue Haas Display 폰트 스타일 */
+.title-item h3 {
+  /* 영문 자간 조정 (타이틀은 더 좁게) */
+  letter-spacing: -0.01em;
+  transform: scaleX(0.97);
+}
+
+.loading-instruction,
+.loading-percentage,
+.scrollbar-text {
+  /* 영문 자간 조정 */
+  letter-spacing: -0.03em;
+}
+
+/* ✅ DOM 콘텐츠 (화면 뒤에 숨김) */
+#page-content {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  z-index: 1;
+  background: #F0A0A0 url('assets/background.jpg') repeat;
+  opacity: 1;
+  /* 깜빡임 방지를 위한 초기값 */
+
+  /* 영문 우선, 한글 fallback */
+  font-family: 'NeueHaasDisplayRoman', 'NeueHaasDisplayMedium', 'HYGothic', sans-serif;
+
+}
+
+.section {
+  background: transparent;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  transition: opacity 0.3s ease;
+}
+
+/* Product section은 유동적 높이 */
+#product.section {
+  height: auto;
+  min-height: auto;
+}
+
+/* Story 섹션 - Home 위로 올라옴 */
+#story {
+  position: relative;
+  z-index: 20;  /* Home 위에 표시 */
+  background-size: auto;
+  min-height: 100vh;
+  padding-top: 10vh;  /* 상단 여백 */
+}
+
+/* Story 전용 컨테이너 */
+.story-container {
+  position: relative;
+  width: 100%;
+  max-width: 1540px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 42px;
+  height: 100%;
+}
+
+/* Story 타이틀 그리드 (3단) */
+.story-item h1 {
+  font-family: 'NeueHaasDisplayMedium', 'HYGothic', sans-serif;
+  font-size: 72pt;
+  line-height: 0.8;
+  color: var(--red);
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
+.story-title-left {
+  text-align: left;
+  overflow: visible;
+  white-space: nowrap;
+  min-width: 0;
+  display: block;
+}
+
+.story-title-center {
+  text-align: center;
+  overflow: visible;
+  white-space: nowrap;
+  min-width: 0;
+  display: block;
+}
+
+.story-title-right {
+  text-align: right;
+  overflow: visible;
+  white-space: nowrap;
+  min-width: 0;
+  display: block;
+}
+
+/* 챕터 표시 (타이틀 바로 아래 중앙) */
+.story-chapter-indicator {
+  position: absolute;
+  top: 22vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.story-chapter-indicator span {
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 1rem;
+  color: var(--red);
+  text-align: center;
+  user-select: none;
+}
+
+/* Story 콘텐츠 그리드 (3x2) */
+.story-content-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 42px;
+  flex: 1;
+  height: 47vh;
+}
+
+.story-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* 1행: 타이틀 위치 지정 */
+.story-item:first-child {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.story-item:nth-child(2) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.story-item:nth-child(3) {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+/* 2행: 콘텐츠 위치 명시적 지정 (4,5,6단) */
+#story-content-left {
+  grid-column: 1;
+  grid-row: 2;
+  text-align: left;
+}
+
+#story-content-center {
+  grid-column: 2;
+  grid-row: 2;
+  text-align: center;
+}
+
+#story-content-right {
+  grid-column: 3;
+  grid-row: 2;
+  text-align: right;
+}
+
+/* 각 단별 콘텐츠 스타일 */
+.story-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  opacity: 1;
+}
+
+.story-number {
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 3rem;
+  color: var(--black);
+  user-select: none;
+}
+
+.story-item p {
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--black);
+}
+
+/* ✅ Threshold Effect - CSS 변수 정의 */
+@property --blur-amount {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+/* Title만 threshold 효과 적용 */
+.story-item h1 {
+  --blur-amount: 0;
+  filter: blur(calc(var(--blur-amount) * 1px)) url(#threshold);
+}
+
+.section-container {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-rows: 1fr 42px 1fr;
+  height: 100%;
+}
+
+#page-content {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+#page-content.loaded {
+  opacity: 1;
+}
+
+/* ✅ 로딩 페이지 */
+#loading-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  pointer-events: auto;
+}
+
+/* ✅ 로딩 영상 컨테이너 (전체 화면) */
+#loading-video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+  pointer-events: none;
+  z-index: 10001;
+}
+
+#loading-video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* ✅ 로딩 배경 이미지 컨테이너 (전체 화면) */
+#loading-background-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+  pointer-events: none;
+  z-index: 10001;
+}
+
+#loading-background-container img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* ✅ 로딩 이미지 컨테이너 (정중앙, 원본 사이즈) */
+#loading-image-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1180px;
+  height: 100%;
+  user-select: none;
+  pointer-events: none;
+  z-index: 10002;
+}
+
+/* ✅ 로딩 인스트럭션 그리드 (Home 타이틀과 동일한 3단 구조) */
+.loading-instruction-grid {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 1540px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 42px;
+  z-index: 10002;
+  pointer-events: none;
+}
+
+.loading-instruction-left,
+.loading-instruction-center,
+.loading-instruction-right {
+  font-size: 60pt;
+  line-height: 0.7;
+  font-family: 'NeueHaasDisplayMedium', 'HYGothic', sans-serif;
+  color: var(--red);
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
+.loading-instruction-left {
+  text-align: left;
+}
+
+.loading-instruction-center {
+  text-align: center;
+}
+
+.loading-instruction-right {
+  text-align: right;
+}
+
+/* ✅ 로딩 퍼센티지 그리드 (로딩 인스트럭션과 동일한 스타일) */
+.loading-percentage-grid {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 1540px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 42px;
+  z-index: 10002;
+  pointer-events: none;
+}
+
+.loading-percentage-left,
+.loading-percentage-center,
+.loading-percentage-right {
+  font-size: 60pt;
+  line-height: 0.8;
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  color: var(--red);
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
+.loading-percentage-left {
+  text-align: left;
+}
+
+.loading-percentage-center {
+  text-align: center;
+}
+
+.loading-percentage-right {
+  text-align: right;
+}
+
+.loading-progress {
+  font-family: 'NeueHaasDisplayRoman', sans-serif;
+  font-size: 1.2rem;
+  color: var(--black);
+  user-select: none;
+}
+
+
+/* ✅ Curtains.js Canvas */
+#canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+/* ✅ Plane 관련 설정 (style-2.css에서 이동) */
+#page-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.curtain {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+.curtain img,
+.curtain video {
+  display: none;
+}
+
+/* ✅ handling errors */
+.no-curtains .curtain {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-curtains .curtain img,
+.no-curtains .curtain video {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* ============================================
+   HOME 섹션 전용 스타일
+   ============================================ */
+
+/* Home 섹션 레이아웃 */
+#home {
+  position: relative;
+  height: 100vh; /* 화면 1개 높이 */
+  overflow: visible;
+  z-index: 30; /* 배경 위에 표시 */
+}
+
+/* Home 섹션의 콘텐츠 컨테이너 */
+#home .section-container {
+  position: relative;
+  width: 100%;
+  height: 51vh; /* 반응형 대응 */
+  background: url('assets/background.jpg') repeat;
+  background-size: auto;
+  z-index: 31; /* Home 섹션 내에서 최상위 */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2% 0;
+}
+
+/* 헤더 */
+.home-header {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1540px;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 42px;
+  z-index: 1000;
+  color: var(--black);
+}
+
+.header-column {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+
+.header-tab {
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 1rem;
+  color: var(--black);
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  user-select: none;
+}
+
+.header-tab:hover {
+  opacity: 0.6;
+}
+
+.header-tab.active {
+  font-family: 'NeueHaasDisplayBold', 'HYGothic', sans-serif;
+  color: var(--red);
+  text-decoration: underline;
+  text-underline-offset: 0em;
+  text-decoration-thickness: 2px;
+}
+
+/* Home 섹션 배경 이미지 (page-content 바로 아래, 독립적) */
+.home-background {
+position: fixed; /* 스크롤에 따라 움직이지 않도록 고정 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+  z-index: 5; /* Home 콘텐츠(z-index:30) 아래, Story(z-index:20) 아래 */
+  pointer-events: none;
+  will-change: transform; /* 성능 최적화 */
+}
+
+.home-background img {
+  width: 100%;
+  height: 100vh;
+  display: block;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.home-bg-img {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.home-bg-img-active {
+  opacity: 1;
+}
+
+.home-bg-img-next {
+  opacity: 0;
+}
+
+/* Home 타이틀 그리드 */
+.home-title-grid {
+  position: relative;
+  width: 100%;
+  max-width: 1540px;
+  margin: 0 auto;
+  margin-top:18px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 42px;
+  z-index: 10;
+}
+
+.home-title-left,
+.home-title-center,
+.home-title-right {
+  font-size: 160pt;
+  line-height: 0.8;
+  font-family: 'NeueHaasDisplayMedium', 'HYGothic', sans-serif;
+  color: var(--red);
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
+.home-title-left {
+  text-align: left;
+}
+
+.home-title-center {
+  text-align: center;
+  line-break: none;
+}
+
+.home-title-right {
+  text-align: right;
+}
+
+.home-title-left h1,
+.home-title-center h1,
+.home-title-right h1 {
+  margin: 0;
+  font-size: 108pt;
+  line-height: 0.7;
+  font-weight: bold;
+}
+
+/* 한국어 텍스트 테두리 */
+.home-title-grid .korean-text {
+  -webkit-text-stroke: 2px var(--red);
+  -webkit-text-fill-color: var(--red);
+}
+
+/* Home 중간 텍스트 그리드 */
+.home-middle-grid {
+  position: relative;
+  width: 100%;
+  max-width: 1540px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr; /* 가운데 칸 2배로 확장 */
+  gap: 42px;
+  z-index: 10;
+}
+
+.home-middle-left,
+.home-middle-right {
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 1rem;
+  color: var(--black);
+  user-select: none;
+}
+
+.home-middle-left {
+  text-align: left;
+}
+
+.home-middle-right {
+  text-align: right;
+}
+
+/* Home 중간 센터 (2단 구조) */
+.home-middle-center {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 42px;
+  white-space: nowrap; /* 줄바꿈 방지 (br 제외) */
+}
+
+.home-middle-center-top {
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 1.5rem;
+  color: var(--black);
+  text-align: right;
+  user-select: none;
+  white-space: normal; /* br 태그 작동하도록 */
+}
+
+.home-middle-center-bottom {
+  color: var(--black);
+  text-align: left;
+  user-select: none;
+  white-space: normal; /* br 태그 작동하도록 */
+}
+
+/* ============================================
+   기타 섹션 스타일
+   ============================================ */
+
+.title-grid {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  grid-row: 1;
+  align-self: start;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 42px;
+  padding: 20px;
+}
+
+.title-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+}
+
+.title-item h1 {
+  position: absolute;
+  top: 0;
+  font-family: 'NeueHaasDisplayMedium', 'HYGothic', sans-serif;
+  font-size: 96pt;
+  line-height: 0.67;
+  margin: 0;
+  color: var(--black);
+  user-select: none;
+}
+
+.title-item h3 {
+  color: var(--black);
+  user-select: none;
+  /* 한글 본문 스타일 상속 */
+}
+
+.section-grid {
+  position: relative;
+  width: 100%;
+  grid-row: 3;
+  align-self: end;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 42px;
+  padding: 20px;
+}
+
+.section-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  user-select: none;
+}
+
+.section-item h3 {
+  font-family: 'NeueHaasDisplayBold', 'HYGothic', sans-serif;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: var(--black);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.section-item p {
+  color: var(--black);
+  /* 한글 본문 스타일은 상단 공통 스타일 적용됨 */
+}
+
+/* ============================================
+   Product Section - Accordion
+   ============================================ */
+
+#product {
+  min-height: auto;
+  height: auto;
+  padding: 5vh 0 10vh 0;
+}
+
+.product-container {
+  position: relative;
+  width: 100%;
+  max-width: 1540px;
+  margin: 0 auto;
+  padding: 0 20px 5vh 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 42px;
+}
+
+/* Product 타이틀 그리드 (Home 타이틀과 동일한 구조) */
+.product-title-grid {
+  position: relative;
+  width: 100%;
+  max-width: 1540px;
+  margin: 0 auto;
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 42px;
+  z-index: 10;
+}
+
+.product-title-left,
+.product-title-center,
+.product-title-right {
+  font-size: 72pt;
+  line-height: 0.8;
+  font-family: 'NeueHaasDisplayMedium', 'HYGothic', sans-serif;
+  color: var(--red);
+  letter-spacing: -0.02em;
+  user-select: none;
+  min-width: 0; /* 그리드 칸 크기 고정 (3등분 유지) */
+  overflow: visible; /* 텍스트가 넘어가도 그리드 칸 크기 유지 */
+}
+
+.product-title-left {
+  text-align: left;
+}
+
+.product-title-center {
+  text-align: center;
+}
+
+.product-title-right {
+  text-align: left; /* 왼쪽 정렬로 변경하여 넘칠 때 왼쪽으로 넘치도록 */
+  display: flex;
+  justify-content: flex-end; /* 컨테이너 내부에서 오른쪽 정렬 */
+}
+
+.product-title-left h1,
+.product-title-center h1,
+.product-title-right h1 {
+  margin: 0;
+  font-size: 72pt;
+  line-height: 0.7;
+  font-weight: bold;
+  user-select: none;
+  overflow: visible;
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+}
+
+/* 오른쪽 타이틀의 h1은 왼쪽 정렬로 하여 넘칠 때 왼쪽으로 넘치도록 */
+.product-title-right h1 {
+  text-align: left;
+}
+
+.product-accordion {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.product-item {
+  border-top: 2px solid var(--black);
+  overflow: hidden;
+}
+
+.product-item:last-child {
+  border-bottom: 2px solid var(--black);
+}
+
+.product-title {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 42px;
+  align-items: center;
+  padding: 20px 0;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.3s ease;
+}
+
+.product-title:hover {
+  opacity: 0.6;
+}
+
+.product-name-en {
+  font-family: 'NeueHaasDisplayBold', 'HYGothic', sans-serif;
+  font-size: 1.5rem;
+  color: var(--black);
+  letter-spacing: -0.01em;
+  text-align: left;
+}
+
+.product-name-ko {
+  font-family: 'HYGothic', 'NeueHaasDisplayRoman', sans-serif;
+  font-size: 1.5rem;
+  color: var(--black);
+  text-align: center;
+}
+
+/* 오른쪽 칸 컨테이너 (정보 + toggle 버튼) */
+.product-info-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+}
+
+.product-info-brief {
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 1rem;
+  color: var(--black);
+  text-align: right;
+}
+
+.product-toggle {
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 2rem;
+  color: var(--black);
+  transition: transform 0.3s ease;
+  flex-shrink: 0; /* toggle 버튼 크기 고정 */
+}
+
+.product-item.active .product-toggle {
+  transform: rotate(45deg);
+}
+
+.product-content {
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.product-item.active .product-content {
+  opacity: 1;
+}
+
+/* 3x2 그리드 구조 */
+.product-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 42px;
+  padding-bottom: 40px;
+}
+
+/* 1행: 이미지 (3단 전체) */
+.product-image {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  width: 100%;
+  overflow: hidden;
+}
+
+.product-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* 2행: 3단 분할 */
+.product-description {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product-specs {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.product-nutrition {
+  grid-column: 3;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* 텍스트 스타일 */
+.product-description h3,
+.product-specs h3,
+.product-nutrition h3 {
+  font-family: 'NeueHaasDisplayBold', 'HYGothic', sans-serif;
+  font-size: 1.2rem;
+  color: var(--black);
+  margin: 0 0 1rem 0;
+}
+
+.product-description p,
+.product-specs p,
+.product-nutrition p {
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--black);
+  margin: 0;
+}
+
+.product-specs .spec-item,
+.product-nutrition .nutrition-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(45, 4, 8, 0.1);
+}
+
+.product-specs .spec-item:last-child,
+.product-nutrition .nutrition-item:last-child {
+  border-bottom: none;
+}
+
+/* ============================================
+   스크롤바
+   ============================================ */
+
+#teeth-scrollbar {
+  position: fixed;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  width: calc((1540px - 84px) / 3); /* 가운데 컬럼 너비: (전체 - gap*2) / 3 */
+  max-width: 485px;
+  z-index: 1000;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: auto;
+}
+
+#teeth-scrollbar.active {
+  display: flex;
+}
+
+.scrollbar-text {
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 1rem;
+  color: var(--black);
+  user-select: none;
+  pointer-events: none;
+}
+
+.scrollbar-lines {
+  display: flex;
+  gap: -0.25rem;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.teeth-line {
+  width: auto;
+  height: 1.4rem;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: opacity 0.3s ease;
+}
+
+.teeth-line:hover {
+  opacity: 0.6;
+}
+
+/* ============================================
+   Contact Section 스타일
+   ============================================ */
+
+/* Contact Section */
+#contact {
+  position: relative;
+}
+
+/* Contact 전용 컨테이너 */
+.contact-container {
+  position: relative;
+  width: 100%;
+  max-width: 1540px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 42px;
+  min-height: 100vh;
+}
+
+/* Contact 콘텐츠 그리드 (3x2) */
+.contact-content-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 42px;
+  flex: 1;
+  height: 47vh;
+}
+
+.contact-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* 1행: 타이틀 위치 지정 */
+.contact-item:first-child {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.contact-item:nth-child(2) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.contact-item:nth-child(3) {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+/* 2행: 콘텐츠 위치 명시적 지정 (4,5,6단) */
+#contact-content-left {
+  grid-column: 1;
+  grid-row: 2;
+  text-align: left;
+}
+
+#contact-content-center {
+  grid-column: 2;
+  grid-row: 2;
+  text-align: center;
+}
+
+#contact-content-right {
+  grid-column: 3;
+  grid-row: 2;
+  text-align: right;
+}
+
+/* Contact 타이틀 스타일 */
+.contact-title-left,
+.contact-title-center,
+.contact-title-right {
+  font-size: 160pt;
+  line-height: 0.8;
+  font-family: 'NeueHaasDisplayMedium', 'HYGothic', sans-serif;
+  color: var(--black);
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
+.contact-title-left {
+  text-align: left;
+}
+
+.contact-title-center {
+  text-align: center;
+}
+
+.contact-title-right {
+  text-align: right;
+}
+
+.contact-title-left h1,
+.contact-title-center h1,
+.contact-title-right h1 {
+  margin: 0;
+  font-size: 108pt;
+  line-height: 0.7;
+  font-weight: bold;
+}
+
+/* Contact 하단 텍스트 */
+.contact-footer-text {
+  position: absolute;
+  bottom: 80px;
+  left: 0;
+  width: 100%;
+  max-width: 1540px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.contact-copyright {
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 1rem;
+  color: var(--black);
+  user-select: none;
+  line-height: 1.6;
+}
+
+.contact-credit-wrapper {
+  position: relative;
+}
+
+.contact-credit {
+  font-family: 'NeueHaasDisplayBold', 'HYGothic', sans-serif;
+  text-decoration: underline;
+  text-underline-offset: 0em;
+  text-decoration-thickness: 2px;
+  font-size: 1rem;
+  color: var(--black);
+  user-select: none;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.contact-credit:hover {
+  opacity: 0.6;
+}
+
+/* Credit 패널 (CREDIT 텍스트 바로 위) */
+.credit-panel {
+  position: absolute;
+  text-align: right;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 10px;
+  background: transparent;
+  padding-bottom: 10px;
+  min-width: 250px;
+  max-width: 400px;
+  z-index: 100;
+  pointer-events: auto;
+}
+
+.credit-names {
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 0.8rem !important;
+  color: var(--black);
+}
+
+.credit-names p {
+  margin: 0.3rem 0;
+  font-size: 0.8rem !important;
+  line-height: 1.2;
+
+}
+
+.credit-names p strong {
+  font-size: 0.8rem !important;
+  font-weight: bold;
+  line-height: 1.2;
+
+}
+
+/* Contact Footer */
+.contact-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+  pointer-events: none;
+  margin-top: auto;
+  transform: translateX(-20px); /* padding 보정 */
+  width: calc(100% + 40px); /* padding 보정 */
+}
+
+.contact-footer img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+/* 반응형 (태블릿) */
+@media (max-width: 1024px) {
+  .section-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 반응형 (모바일) */
+@media (max-width: 768px) {
+  .section-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}

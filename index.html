@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>32 TEE TH</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- GSAP CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+</head>
+
+<body>
+    <!-- ✅ Curtains.js WebGL 캔버스 -->
+    <div id="canvas"></div>
+
+    <!-- ✅ 로딩 페이지 (별도) -->
+    <div id="loading-page">
+        <!-- 영상 컨테이너 (정중앙, 원본 사이즈) -->
+        <div id="loading-video-container">
+            <video id="loading-video" muted playsinline>
+                <!-- 비디오 소스는 JS에서 동적으로 설정 -->
+            </video>
+        </div>
+        
+        <!-- 특정 배경 이미지 (비디오 사이에 표시) -->
+        <div id="loading-background-container" style="display: none;">
+            <img src="assets/loading-background.jpg" alt="Background">
+        </div>
+        
+        <!-- 이미지 컨테이너 (정중앙, 원본 사이즈, 초기 숨김) -->
+        <div id="loading-image-container" style="display: none;">
+            <!-- 배경 이미지 (plane으로 사용) -->
+            <img src="assets/loading-background.jpg" crossorigin="" data-sampler="uSampler0" alt="Loading Background"
+                style="display: none;">
+            <!-- Bite 텍스처 (shader 왜곡용) -->
+            <img src="assets/loading.png" crossorigin="" data-sampler="uBiteTexture" alt="Bite Texture"
+                style="display: none;">
+        </div>
+        <!-- 텍스트 (plane과 분리) -->
+        <div class="loading-instruction-grid" id="loading-instruction-grid">
+            <div class="loading-instruction-left"></div>
+            <div class="loading-instruction-center">PRESS</br>TO</br>BITE</div>
+            <div class="loading-instruction-right"></div>
+        </div>
+        <div class="loading-percentage-grid" id="loading-percentage-grid" style="display: none;">
+            <div class="loading-percentage-left"></div>
+            <div class="loading-percentage-center">0</div>
+            <div class="loading-percentage-right"></div>
+        </div>
+    </div>
+
+    <!-- ✅ HTML DOM 콘텐츠 (로딩 후 표시) -->
+    <div id="page-content" style="display: none;">
+
+        <!-- 배경 이미지 (Home 섹션과 독립) -->
+        <div class="home-background">
+            <img src="assets/images/story1.png" alt="Story Background" class="home-bg-img home-bg-img-active">
+            <img src="assets/images/story1.png" alt="Story Background" class="home-bg-img home-bg-img-next">
+        </div>
+
+        <div class="section" id="home">
+            <!-- 헤더 -->
+            <header class="home-header">
+                <div class="header-column">
+                    <div class="header-tab active" data-tab="home">HOME</div>
+                </div>
+                <div class="header-column">
+                    <div class="header-tab" data-tab="product">PRODUCT</div>
+                </div>
+                <div class="header-column">
+                    <div class="header-tab" data-tab="contact">CONTACT</div>
+                </div>
+            </header>
+
+            <div class="section-container">
+                <!-- 타이틀 그리드 (160pt, 줄간격 좁음) -->
+                <div class="home-title-grid">
+                    <div class="home-title-left">
+                        <h1>32<br><span class="korean-text">써티</span></h1>
+                    </div>
+                    <div class="home-title-center">
+                        <h1>TEE<br><span class="korean-text">투</span></h1>
+                    </div>
+                    <div class="home-title-right">
+                        <h1>TH<br><span class="korean-text">티쓰</span></h1>
+                    </div>
+                </div>
+
+                <!-- 중간 텍스트 그리드 -->
+                <div class="home-middle-grid">
+                    <div class="home-middle-left">CLICK TO BITE</div>
+                    <div class="home-middle-center">
+                        <div class="home-middle-center-top">
+                            How does the smooth food<br>end up deadening our senses?
+                        </div>
+                        <div class="home-middle-center-bottom">
+                            매끈한 음식은<br>어떻게 우리의 감각을 퇴화시키는가?
+                        </div>
+                    </div>
+                    <div class="home-middle-right">SCROLL FOR MORE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Story 섹션 (Chapter 1~3 통합) -->
+        <div class="section" id="story">
+            <div class="story-container">
+                <!-- 콘텐츠 그리드 (3x2, 42px gap) -->
+                <div class="story-content-grid">
+                    <!-- 1행: 타이틀 -->
+                    <!-- 1단 -->
+                    <div class="story-item">
+                        <div class="story-title-left">
+                            <h1 id="story-title-left">BEWARE</h1>
+                        </div>
+                    </div>
+                    <!-- 2단 -->
+                    <div class="story-item">
+                        <div class="story-title-center">
+                            <h1 id="story-title-center">THE</h1>
+                        </div>
+                    </div>
+                    <!-- 3단 -->
+                    <div class="story-item">
+                        <div class="story-title-right">
+                            <h1 id="story-title-right">SMOOTH</h1>
+                        </div>
+                    </div>
+
+                    <!-- 2행: 콘텐츠 -->
+                    <!-- 4단: 1번째 챕터 콘텐츠 -->
+                    <div class="story-item story-item-active" id="story-content-left">
+                        <div class="story-number">1</div>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent fringilla erat sit amet
+                            efficitur suscipit.</p>
+                        <p class="korean-body-text">국가는 노인과 청소년의 복지향상을 위한 정책을 실시할 의무를 진다. 언론・출판에 대한 허가나 검열과 집회・결사에 대한
+                            인허가지 아니한다.</p>
+                    </div>
+                    <!-- 5단: 2번째 챕터 콘텐츠 -->
+                    <div class="story-item story-item-active" id="story-content-center" style="visibility: hidden; opacity: 0;">
+                        <div class="story-number">2</div>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent fringilla erat sit amet
+                            efficitur suscipit.</p>
+                        <p class="korean-body-text">국가는 노인과 청소년의 복지향상을 위한 정책을 실시할 의무를 진다. 언론・출판에 대한 허가나 검열과 집회・결사에 대한
+                            인허가지 아니한다.</p>
+                    </div>
+                    <!-- 6단: 3번째 챕터 콘텐츠 -->
+                    <div class="story-item story-item-active" id="story-content-right" style="visibility: hidden; opacity: 0;">
+                        <div class="story-number">3</div>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent fringilla erat sit amet
+                            efficitur suscipit.</p>
+                        <p class="korean-body-text">국가는 노인과 청소년의 복지향상을 위한 정책을 실시할 의무를 진다. 언론・출판에 대한 허가나 검열과 집회・결사에 대한
+                            인허가지 아니한다.</p>
+                    </div>
+                </div>
+                
+                <!-- CH 표기 (타이틀 아래 중앙) -->
+                <div class="story-chapter-indicator">
+                    <span id="story-chapter-display">CH 1</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="product">
+            <div class="product-container">
+                <!-- 상단 타이틀 (3단 구조) -->
+                <div class="product-title-grid">
+                    <div class="product-title-left">
+                        <h1>TOOLS</h1>
+                    </div>
+                    <div class="product-title-center">
+                        <h1>OF</h1>
+                    </div>
+                    <div class="product-title-right">
+                        <h1>MASTICATION</h1>
+                    </div>
+                </div>
+
+                <!-- 아코디언 리스트 (JS로 동적 생성) -->
+                <div class="product-accordion" id="product-list">
+                    <!-- 상품 리스트는 JS에서 동적으로 생성됩니다 -->
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="contact">
+            <div class="contact-container">
+                <!-- 콘텐츠 그리드 (3x2, 42px gap) -->
+                <div class="contact-content-grid">
+                    <!-- 1행: 타이틀 -->
+                    <!-- 1단 -->
+                    <div class="contact-item">
+                        <div class="contact-title-left">
+                            <h1 id="contact-title-left">CON</h1>
+                        </div>
+                    </div>
+                    <!-- 2단 -->
+                    <div class="contact-item">
+                        <div class="contact-title-center">
+                            <h1 id="contact-title-center"></h1>
+                        </div>
+                    </div>
+                    <!-- 3단 -->
+                    <div class="contact-item">
+                        <div class="contact-title-right">
+                            <h1 id="contact-title-right">TACT</h1>
+                        </div>
+                    </div>
+
+                    <!-- 2행: 콘텐츠 -->
+                    <!-- 4단: 왼쪽 콘텐츠 -->
+                    <div class="contact-item" id="contact-content-left">
+                        <h3>LINK</h3>
+                        <p>↗Instagram</p>
+                    </div>
+                    <!-- 5단: 중앙 콘텐츠 -->
+                    <div class="contact-item" id="contact-content-center">
+                        <h3></h3>
+                        <p></p>
+                    </div>
+                    <!-- 6단: 오른쪽 콘텐츠 -->
+                    <div class="contact-item" id="contact-content-right">
+                        <h3>ADDRESS</h3>
+                        <p>+82 (0)3 2432 2432<br>
+                            mail@theraw.studio<br>서울특별시 중구 마른내로 32 102</p>
+                    </div>
+                </div>
+                
+                <!-- Contact 하단 텍스트 -->
+                <div class="contact-footer-text">
+                    <div class="contact-copyright">Date 2025.11.<br>
+                        Copyright © 2025 STUDIO THE RAW.<br>
+                        All Rights Reserved.</div>
+                    <div class="contact-credit-wrapper">
+                        <div class="contact-credit" id="contact-credit">CREDIT</div>
+                        <!-- Credit 패널 -->
+                        <div class="credit-panel" id="credit-panel" style="display: none;">
+                            <div class="credit-names" id="credit-names">
+                                <!-- 친구 이름들이 여기에 표시됩니다 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Footer SVG -->
+                <div class="contact-footer">
+                    <img src="assets/contact-footer.svg" alt="Contact Footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ SVG 필터 정의 (Threshold Effect) -->
+    <svg class="svg-filters" style="position: absolute; width: 0; height: 0; overflow: hidden;"
+        xmlns="http://www.w3.org/2000/svg">
+        <filter id="threshold">
+            <feComponentTransfer>
+                <feFuncR type="table" tableValues="0 0 0 0 0.8 1 1" />
+                <feFuncG type="table" tableValues="0 0 0 0 0.8 1 1" />
+                <feFuncB type="table" tableValues="0 0 0 0 0.8 1 1" />
+                <feFuncA type="discrete" tableValues="0 1" />
+            </feComponentTransfer>
+        </filter>
+    </svg>
+
+    <!-- ✅ 커스텀 스크롤바 (Teeth Navigation) -->
+    <div id="teeth-scrollbar">
+        <div class="scrollbar-text">24</div>
+
+        <div class="scrollbar-lines">
+            <img src="assets/scrollbar/thin1.svg" alt="" class="teeth-line" data-section="0" data-target="home">
+            <img src="assets/scrollbar/thin2.svg" alt="" class="teeth-line" data-section="1" data-target="story" data-chapter="1">
+            <img src="assets/scrollbar/thin3.svg" alt="" class="teeth-line" data-section="2" data-target="story" data-chapter="2">
+            <img src="assets/scrollbar/thin4.svg" alt="" class="teeth-line" data-section="3" data-target="story" data-chapter="3">
+            <img src="assets/scrollbar/thin5.svg" alt="" class="teeth-line" data-section="4" data-target="product">
+            <img src="assets/scrollbar/thin6.svg" alt="" class="teeth-line" data-section="5" data-target="contact">
+        </div>
+        <div class="scrollbar-text">32</div>
+    </div>
+
+    <script src="main.js" type="module"></script>
+
+</body>
+
+</html>
