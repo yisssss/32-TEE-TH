@@ -617,6 +617,7 @@ window.addEventListener("load", () => {
     function startMainPage() {
         // 로딩 정리 함수
         function cleanupLoading() {
+            console.log('🧹 cleanupLoading 시작!');
             // 로딩 plane 제거
             if (loadingPlane) {
                 loadingPlane.remove();
@@ -664,6 +665,7 @@ window.addEventListener("load", () => {
 
     // HTML 요소 관련 기능 초기화 함수
     function initHTMLFeatures() {
+        console.log('🚀 initHTMLFeatures 시작!');
         initSmoothScroll();
         initTeethScrollbar();
         initHeaderTabs();
@@ -671,6 +673,7 @@ window.addEventListener("load", () => {
         initStoryScroll();
         initProductSection();
         initContactCredit();
+        console.log('🚀 initHTMLFeatures 완료!');
     }
 
     // 부드러운 스크롤 초기화 (커스텀 구현)
