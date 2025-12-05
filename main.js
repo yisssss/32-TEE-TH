@@ -1118,7 +1118,7 @@ gsap.to(homeBackground, {
                 number: '1',
                 subTitle: '매끈한 세상',
                 textEn: 'How does food, intentionally stripped of unpleasant experiences—such as being tough, bitter, or sour—in order to be produced more efficiently and cheaply, or to appeal to a wider audience, kill our senses?',
-                textKo: '보다 효율적이고 저렴하게 생산되기 위해, 혹은 보다 많은 이에게 매력적이기 위해 유쾌하지 않은 경험— 질기거나, 쓰고 신맛이 나는—이 의도적으로 제거된 음식은 어떻게 우리의 감각을 살해하는가?'
+                textKo: '보다 효율적이고 저렴하게 생산되기 위해, 혹은 보다 많은 이에게 매력적이기 위해 유쾌하지 않은 경험—질기거나, 쓰고 신맛이 나는—이 의도적으로 제거된 음식은 어떻게 우리의 감각을 살해하는가?'
             },
             {
                 chapter: 2,
@@ -1137,8 +1137,8 @@ gsap.to(homeBackground, {
                 titleRight: 'BODY',
                 number: '3',
                 subTitle: '퇴화하는 몸',
-                textEn: 'We can only find primordial sensations through what we actually possess. There are experiences only possible through non-smooth food.',
-                textKo: '우린 우리가 실제로 가진 것을 통해서만원초의 감각을 찾을 수 있다. 매끄럽지 않은 음식을 통해서만 가능한 경험이 있다.'
+                textEn: 'We can only find primordial sensations through what we actually possess. 32 TEE TH eats to no longer lose what human possess.',
+                textKo: '우린 우리가 실제로 가진 것을 통해서만 원초의 감각을 찾을 수 있다. 써티 투 티쓰는 인간이 가진 것을 잃지 않기 위해 먹는다.'
             }
         ];
 
@@ -1398,7 +1398,7 @@ gsap.fromTo(homeBackground,
             const titleHtml = `
                 <div class="product-title">
                     <div class="product-name-en">${product.nameEn}</div>
-                    <div class="product-name-ko">${product.nameKo} (${product.nameKoHanja})</div>
+                    <div class="product-name-ko">${product.nameKo} ${product.nameKoHanja}</div>
                     <div class="product-info-right">
                         <div class="product-info-brief">${product.type}  |  ${product.weight}  |  ${product.calories}</div>
                         <span class="product-toggle">+</span>
@@ -1418,7 +1418,7 @@ gsap.fromTo(homeBackground,
                         <!-- 2행: 3단 분할 -->
                         <!-- 1단: 설명 -->
                         <div class="product-description">
-                            <h3>${product.nameEn}<br>${product.nameKo} (${product.nameKoHanja})</h3>
+                            <h3>${product.nameEn}<br>${product.nameKo} ${product.nameKoHanja}</h3>
                             <p class="korean-body-text">${product.description.replace(/\n/g, '<br>')}</p>
                         </div>
 
@@ -1458,7 +1458,7 @@ gsap.fromTo(homeBackground,
                             `).join('')}
                             <p class="korean-body-text" style="margin-top: 1rem; font-size: 0.75rem;">
                                 1일 영양성분 기준치에 대한 비율(%)은 2,000kcal 기준이므로
-                                개인 필요 열량에 따라 다를 수 있습니다.
+                            </br>개인 필요 열량에 따라 다를 수 있습니다.
                             </p>
                         </div>
                     </div>
