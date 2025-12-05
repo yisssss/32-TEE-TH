@@ -68,6 +68,8 @@ window.addEventListener("load", () => {
     const loadingInstructionGrid = document.getElementById('loading-instruction-grid');
     const loadingPercentageGrid = document.getElementById('loading-percentage-grid');
     const loadingPercentageCenter = loadingPercentageGrid ? loadingPercentageGrid.querySelector('.loading-percentage-center') : null;
+    const loadingPercentageNumber = loadingPercentageCenter ? loadingPercentageCenter.querySelector('.loading-percentage-number') : null;
+    const loadingPercentageMessage = loadingPercentageCenter ? loadingPercentageCenter.querySelector('.loading-percentage-message') : null;
     const pageContent = document.getElementById('page-content');
     const teethScrollbar = document.getElementById('teeth-scrollbar');
 
@@ -268,8 +270,15 @@ window.addEventListener("load", () => {
                 isPressing = false;
 
                 // percentage 표시 리셋
-                if (loadingPercentageCenter) {
+                if (loadingPercentageNumber) {
+                    loadingPercentageNumber.textContent = '0';
+                } else if (loadingPercentageCenter) {
                     loadingPercentageCenter.textContent = '0';
+                }
+
+                // 메시지 숨기기
+                if (loadingPercentageMessage) {
+                    loadingPercentageMessage.style.display = 'none';
                 }
 
                 // shader plane 숨기기
@@ -620,8 +629,16 @@ window.addEventListener("load", () => {
                 }
                 
                 // 퍼센티지 표시 (항상 업데이트)
-                if (loadingPercentageCenter) {
-                    loadingPercentageCenter.textContent = Math.round(loadingProgress * 100);
+                const percentText = Math.round(loadingProgress * 100);
+                if (loadingPercentageNumber) {
+                    loadingPercentageNumber.textContent = percentText;
+                } else if (loadingPercentageCenter) {
+                    loadingPercentageCenter.textContent = percentText; // fallback when structure not updated
+                }
+
+                // 메시지 보이기/숨기기: progress > 0이면 표시
+                if (loadingPercentageMessage) {
+                    loadingPercentageMessage.style.display = loadingProgress > 0 ? 'block' : 'none';
                 }
             }).onAfterResize(() => {
                 // 리사이즈 시 plane 크기 업데이트 (이미지 원본 사이즈 유지)
@@ -1666,7 +1683,9 @@ gsap.fromTo(homeBackground,
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && loadingPage && loadingPage.style.display !== 'none') {
             loadingProgress = 1.0;
-            if (loadingPercentageCenter) {
+            if (loadingPercentageNumber) {
+                loadingPercentageNumber.textContent = '100';
+            } else if (loadingPercentageCenter) {
                 loadingPercentageCenter.textContent = '100';
             }
             startMainPage();

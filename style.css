@@ -499,6 +499,20 @@ body *:lang(en),
   text-align: center;
 }
 
+/* Message shown above the numeric percentage when progress > 0 */
+.loading-percentage-message {
+  display: none; /* shown via JS when progress > 0 */
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.2px;
+  color: var(--red);
+  line-height: 1;
+  user-select: none;
+  margin-bottom: 18px;
+}
+
+/* numeric element uses parent's sizing */
+
 .loading-percentage-right {
   text-align: right;
 }
