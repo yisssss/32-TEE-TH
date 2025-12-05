@@ -227,6 +227,7 @@ window.addEventListener("load", () => {
 
             // 이미지 컨테이너 및 Plane 설정 함수
         const setupPlaneWithImageSize = () => {
+            console.log('🖼️ setupPlaneWithImageSize 시작...');
             const imgWidth = backgroundImg.naturalWidth || backgroundImg.width;
             const imgHeight = backgroundImg.naturalHeight || backgroundImg.height;
             
@@ -512,6 +513,7 @@ window.addEventListener("load", () => {
                     
                     // 100% 도달 체크
                     if (loadingProgress >= 0.99 && !isCompleted) {
+                        console.log('🎉 로딩 100% 도달! 2초 후 메인 페이지로...');
                         isCompleted = true;
                         loadingProgress = 1.0;
                         loadingBiteIntensities[currentBiteIndex] = 1.0;
@@ -615,6 +617,7 @@ window.addEventListener("load", () => {
 
     // 메인 페이지 시작
     function startMainPage() {
+        console.log('🎬 startMainPage 호출됨!');
         // 로딩 정리 함수
         function cleanupLoading() {
             console.log('🧹 cleanupLoading 시작!');
@@ -652,12 +655,14 @@ window.addEventListener("load", () => {
         
         // 로딩 페이지 페이드아웃
         if (gsap && loadingPage) {
+            console.log('🎨 GSAP 페이드 애니메이션 시작...');
             gsap.to(loadingPage, {
                 opacity: 0,
                 duration: 0.5,
                 onComplete: cleanupLoading
             });
         } else {
+            console.log('⚠️ GSAP 또는 loadingPage가 없음, 직접 cleanupLoading 호출');
             cleanupLoading();
         }
     }
@@ -1610,16 +1615,6 @@ gsap.fromTo(homeBackground,
             }
         });
     }
-
-    const originalInitHTMLFeatures = initHTMLFeatures;
-    initHTMLFeatures = function() {
-        originalInitHTMLFeatures();
-        initHeaderTabs();
-        initHomeReveal();
-        initStoryScroll();
-        initProductSection();
-        initContactCredit();
-    };
 
     // 디버깅용 - ESC 키로 로딩 스킵
     window.addEventListener('keydown', (e) => {
