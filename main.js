@@ -657,10 +657,26 @@ window.addEventListener("load", () => {
             // 레이아웃이 완전히 안정화된 후 HTML 기능 초기화 (ScrollTrigger 생성)
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    console.log('🚀 레이아웃 안정화 완료, initHTMLFeatures 실행...');
+                    console.log('🚀 레이아웃 안정화 완료, 강제 리사이즈 시작...');
 
-                    // 강제 리사이즈 이벤트 먼저 발생
+                    // 강제로 화면을 살짝 작게 만들었다가 원래대로 돌리기
+                    const body = document.body;
+                    const originalWidth = body.style.width;
+                    const originalOverflow = body.style.overflow;
+
+                    // 1. 살짝 작게
+                    body.style.width = 'calc(100% - 1px)';
+                    body.style.overflow = 'hidden';
+                    void body.offsetHeight; // 리플로우 강제
+
+                    // 2. 원래대로
+                    body.style.width = originalWidth;
+                    body.style.overflow = originalOverflow;
+                    void body.offsetHeight; // 리플로우 강제
+
+                    // resize 이벤트 발생
                     window.dispatchEvent(new Event('resize'));
+                    console.log('✅ 강제 리사이즈 완료');
 
                     // HTML 기능 초기화 (이제 레이아웃이 올바르게 계산됨)
                     initHTMLFeatures();
@@ -671,7 +687,7 @@ window.addEventListener("load", () => {
                             console.log('🔄 ScrollTrigger 최종 새로고침...');
                             window.ScrollTrigger.refresh();
                         }
-                    }, 50);
+                    }, 100);
                 });
             });
         }
