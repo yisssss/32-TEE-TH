@@ -507,33 +507,6 @@ body *:lang(en),
   z-index: 5;
 }
 
-.curtain {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: auto;
-}
-
-.curtain img,
-.curtain video {
-  display: none;
-}
-
-/* ✅ handling errors */
-.no-curtains .curtain {
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.no-curtains .curtain img,
-.no-curtains .curtain video {
-  display: block;
-  max-width: 100%;
-  max-height: 100%;
-}
 
 /* ============================================
    HOME 섹션 전용 스타일

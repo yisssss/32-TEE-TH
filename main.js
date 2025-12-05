@@ -1,4 +1,4 @@
-import {Curtains, Plane} from './curtainsjs/src/index.mjs';
+import {LoadingPlane} from './loading-webgl.js';
 
 // ============================================
 // 📌 모든 상수 설정 (한 곳에서 관리)
@@ -50,18 +50,6 @@ const CONSTANTS = {
         },
     },
     
-    // Main Plane Shader Uniforms
-    MAIN_PLANE: {
-        distortionStrength: 0.04,       // 왜곡 강도
-        biteRadius: 0.3,                // 이빨 자국 반경
-        blurRadius: 4.0,                // 블러 범위
-        ringThickness: 0.8,             // 링 두께
-        dilation: 2.0,                  // 확장
-        edgeSoftness: 0.8,              // 가장자리 부드러움
-        highlightIntensity: 0.3,        // 하이라이트 강도
-        shadowIntensity: 0.5,           // 그림자 강도
-        lightSpread: 1.5,               // 빛 확산
-    },
 };
 
 window.addEventListener("load", () => {
@@ -70,42 +58,6 @@ window.addEventListener("load", () => {
     }
     
     gsap.registerPlugin(ScrollTrigger);
-    
-    const curtains = new Curtains({
-        container: "canvas",
-        watchScroll: false,
-        pixelRatio: Math.min(1.5, window.devicePixelRatio)
-    });
-
-    // handling errors
-    curtains.onError(() => {
-        document.body.classList.add("no-curtains");
-    }).onContextLost(() => {
-        curtains.restoreContext();
-    });
-
-    // get our plane element
-    const planeElements = document.getElementsByClassName("curtain");
-
-    // bitemark 쉐이더를 사용하기 위한 변수들 (상수 객체에서 참조)
-    const MAX_BITES = CONSTANTS.MAX_BITES;
-    const MIN_PRESS_DURATION = CONSTANTS.MIN_PRESS_DURATION;
-    const MAX_PRESS_DURATION = CONSTANTS.MAX_PRESS_DURATION;
-    const MIN_PRESS_INTENSITY = CONSTANTS.MIN_PRESS_INTENSITY;
-    const MAX_PRESS_INTENSITY = CONSTANTS.MAX_PRESS_INTENSITY;
-
-    // 순환 인덱스 사용 (가장 오래된 것을 덮어쓰기)
-    let currentBiteIndex = 0;
-    let biteCount = 0;
-    // 평탄화된 배열 미리 생성
-    const bitePositions = new Float32Array(MAX_BITES * 2);
-    const biteIntensities = new Float32Array(MAX_BITES);
-    const biteRotations = new Float32Array(MAX_BITES); // 각 bite의 회전 각도
-
-    // 현재 클릭 상태 추적
-    let pressStartTime = 0;
-    let currentPressIndex = -1;
-    let isMouseDown = false;
 
     // shaders 폴더의 쉐이더 파일들을 읽어오기
     let vs = '';
@@ -141,7 +93,7 @@ window.addEventListener("load", () => {
     // 로딩 페이지 초기화
     function initLoadingPage() {
         if (!loadingPage) {
-            initPlane();
+            initHTMLFeatures();
             return;
         }
 
@@ -154,16 +106,16 @@ window.addEventListener("load", () => {
         const loadingVideo = document.getElementById('loading-video');
         const loadingBackgroundContainer = document.getElementById('loading-background-container');
         const loadingImageContainer = document.getElementById('loading-image-container');
-        
+
         if (!loadingVideoContainer || !loadingVideo || !loadingBackgroundContainer || !loadingImageContainer) {
-            initPlane();
+            initHTMLFeatures();
             return;
         }
 
         // 배경 이미지 로드 후 원본 사이즈 가져오기
         const backgroundImg = loadingImageContainer.querySelector('img[data-sampler="uSampler0"]');
         if (!backgroundImg) {
-            initPlane();
+            initHTMLFeatures();
             return;
         }
 
@@ -417,7 +369,7 @@ window.addEventListener("load", () => {
             };
             
             // Plane 생성 (이미지 컨테이너에 적용)
-            loadingPlane = new Plane(curtains, loadingImageContainer, params);
+            loadingPlane = new LoadingPlane(loadingImageContainer, params);
             
             loadingPlane.onReady(() => {
                 // 이미지 컨테이너에 pointer-events 명시적 설정
@@ -652,8 +604,8 @@ window.addEventListener("load", () => {
                 const planeBoundingRect = loadingPlane.getBoundingRect();
                 loadingPlane.uniforms.resolution.value = [planeBoundingRect.width, planeBoundingRect.height];
             }).onError(() => {
-                // 실패 시 메인 plane으로 진행
-                initPlane();
+                // 실패 시 HTML features만 초기화
+                initHTMLFeatures();
             });
         };
 
@@ -694,14 +646,7 @@ window.addEventListener("load", () => {
             }
             
             // HTML 기능 초기화 (스크롤 시스템 포함)
-            initHTMLFeatures();
-            
-            // 메인 plane 초기화 (plane 요소가 있을 경우에만)
-            if (planeElements.length > 0) {
-                setTimeout(() => {
-                    initPlane();
-                }, 600);
-            }
+            // Already called initHTMLFeatures above
         }
         
         // 로딩 페이지 페이드아웃
@@ -716,320 +661,16 @@ window.addEventListener("load", () => {
         }
     }
 
-    // Intensity 업데이트 함수
-    function updateBiteIntensity(plane, index, pressDuration) {
-        if (index < 0 || index >= MAX_BITES) return;
-
-        const normalized = Math.max(0, Math.min(1,
-            (pressDuration - MIN_PRESS_DURATION) / (MAX_PRESS_DURATION - MIN_PRESS_DURATION)
-        ));
-
-        const newIntensity = MIN_PRESS_INTENSITY +
-            (MAX_PRESS_INTENSITY - MIN_PRESS_INTENSITY) * normalized;
-
-        if (Math.abs(biteIntensities[index] - newIntensity) > 0.01) {
-            biteIntensities[index] = newIntensity;
-            plane.uniforms.biteIntensities.value = biteIntensities;
-        }
-    }
-
-    // 이미지/비디오 비율에 맞춰 plane 크기 조정
-    function adjustPlaneSize(planeElement, media) {
-        // 비디오인지 이미지인지 확인
-        const isVideo = media.tagName === 'VIDEO';
-        const mediaWidth = isVideo ? media.videoWidth : media.naturalWidth;
-        const mediaHeight = isVideo ? media.videoHeight : media.naturalHeight;
-        const mediaAspect = mediaWidth / mediaHeight;
-
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-
-        // 60vw를 기준으로 하되, 미디어 비율 유지
-        let planeWidth = viewportWidth * 0.6;
-        let planeHeight = planeWidth / mediaAspect;
-
-        // 높이가 화면을 벗어나면 높이 기준으로 재조정
-        if (planeHeight > viewportHeight * 0.8) {
-            planeHeight = viewportHeight * 0.8;
-            planeWidth = planeHeight * mediaAspect;
-        }
-
-        planeElement.style.width = planeWidth + 'px';
-        planeElement.style.height = planeHeight + 'px';
-    }
-
-    function initPlane() {
-        // plane 생성 전에 초기 크기 설정
-        const planeElement = planeElements[0];
-        const media = planeElement.querySelector('img[data-sampler="uSampler0"]') ||
-                      planeElement.querySelector('video[data-sampler="uSampler0"]');
-
-        // 미디어가 이미 로드되어 있다면 크기 조정
-        const isLoaded = media.tagName === 'VIDEO' ?
-                        (media.readyState >= 2 && media.videoWidth > 0) :
-                        (media.complete && media.naturalWidth > 0);
-
-        if (isLoaded) {
-            adjustPlaneSize(planeElement, media);
-            // 비디오인 경우 재생 시작
-            if (media.tagName === 'VIDEO' && media.paused) {
-                media.play().catch(err => {});
-            }
-        } else {
-            // 기본 크기 설정 (미디어 로드 전)
-            planeElement.style.width = '60vw';
-            planeElement.style.height = '60vh';
-
-            // 비디오인 경우 로드 후 재생
-            if (media.tagName === 'VIDEO') {
-                media.addEventListener('loadeddata', () => {
-                    media.play().catch(err => {});
-                }, { once: true });
-            }
-        }
-
-        // parameters
-        const params = {
-            vertexShader: vs,
-            fragmentShader: fs,
-            widthSegments: 20,
-            heightSegments: 20,
-            uniforms: {
-                resolution: {
-                    name: "uResolution",
-                    type: "2f",
-                    value: [planeElements[0].clientWidth, planeElements[0].clientHeight],
-                },
-                time: {
-                    name: "uTime",
-                    type: "1f",
-                    value: 0,
-                },
-                bitePositions: {
-                    name: "uBitePositions",
-                    type: "2fv", // 배열 타입 (vec2 배열)
-                    value: new Float32Array(MAX_BITES * 2),
-                },
-                biteIntensities: {
-                    name: "uBiteIntensities",
-                    type: "1fv", // 배열 타입 (float 배열)
-                    value: new Float32Array(MAX_BITES),
-                },
-                biteRotations: {
-                    name: "uBiteRotations",
-                    type: "1fv", // 배열 타입 (float 배열)
-                    value: new Float32Array(MAX_BITES),
-                },
-                biteCount: {
-                    name: "uBiteCount",
-                    type: "1i",
-                    value: 0,
-                },
-                distortionStrength: {
-                    name: "uDistortionStrength",
-                    type: "1f",
-                    value: CONSTANTS.MAIN_PLANE.distortionStrength,
-                },
-                biteRadius: {
-                    name: "uBiteRadius",
-                    type: "1f",
-                    value: CONSTANTS.MAIN_PLANE.biteRadius,
-                },
-                // 엠보싱 효과를 위한 추가 uniform
-                blurRadius: {
-                    name: "uBlurRadius",
-                    type: "1f",
-                    value: CONSTANTS.MAIN_PLANE.blurRadius,
-                },
-                ringThickness: {
-                    name: "uRingThickness",
-                    type: "1f",
-                    value: CONSTANTS.MAIN_PLANE.ringThickness,
-                },
-                dilation: {
-                    name: "uDilation",
-                    type: "1f",
-                    value: CONSTANTS.MAIN_PLANE.dilation,
-                },
-                edgeSoftness: {
-                    name: "uEdgeSoftness",
-                    type: "1f",
-                    value: CONSTANTS.MAIN_PLANE.edgeSoftness,
-                },
-                highlightIntensity: {
-                    name: "uHighlightIntensity",
-                    type: "1f",
-                    value: CONSTANTS.MAIN_PLANE.highlightIntensity,
-                },
-                shadowIntensity: {
-                    name: "uShadowIntensity",
-                    type: "1f",
-                    value: CONSTANTS.MAIN_PLANE.shadowIntensity,
-                },
-                lightSpread: {
-                    name: "uLightSpread",
-                    type: "1f",
-                    value: CONSTANTS.MAIN_PLANE.lightSpread,
-                }
-            }
-        };
-
-        // create our plane
-        const simplePlane = new Plane(curtains, planeElements[0], params);
-
-        // plane이 준비되면
-        simplePlane.onReady(() => {
-            simplePlane.setPerspective(35);
-
-            // 미디어의 실제 비율을 반영하여 plane 크기 조정
-            const planeElement = planeElements[0];
-            const media = planeElement.querySelector('img[data-sampler="uSampler0"]') ||
-                         planeElement.querySelector('video[data-sampler="uSampler0"]');
-
-            // 미디어 로드 완료 후 aspect ratio 적용
-            const isVideo = media.tagName === 'VIDEO';
-            const isLoaded = isVideo ?
-                            (media.readyState >= 2 && media.videoWidth > 0) :
-                            (media.complete && media.naturalWidth > 0);
-
-            if (isLoaded) {
-                adjustPlaneSize(planeElement, media);
-                // 비디오인 경우 재생 시작
-                if (isVideo && media.paused) {
-                    media.play().catch(err => {});
-                }
-            } else {
-                const eventName = isVideo ? 'loadedmetadata' : 'load';
-                media.addEventListener(eventName, () => {
-                    adjustPlaneSize(planeElement, media);
-                    // 비디오인 경우 재생 시작
-                    if (isVideo && media.paused) {
-                        media.play().catch(err => {});
-                    }
-                });
-            }
-
-            // 마우스 다운 이벤트 핸들러
-            function handleMouseDown(e) {
-                let clientX, clientY;
-
-                if (e.targetTouches) {
-                    // 터치 이벤트
-                    clientX = e.targetTouches[0].clientX;
-                    clientY = e.targetTouches[0].clientY;
-                } else {
-                    // 마우스 이벤트
-                    clientX = e.clientX;
-                    clientY = e.clientY;
-                }
-
-                // plane의 실제 위치와 크기 가져오기
-                const rect = planeElement.getBoundingClientRect();
-
-                // plane 영역 밖이면 무시
-                if (clientX < rect.left || clientX > rect.right ||
-                    clientY < rect.top || clientY > rect.bottom) {
-                    return;
-                }
-
-                // plane 내부 상대 좌표 계산 (0~1 범위)
-                const relativeX = (clientX - rect.left) / rect.width;
-                const relativeY = (clientY - rect.top) / rect.height;
-
-                isMouseDown = true;
-                pressStartTime = Date.now();
-
-                // UV 좌표 계산 (Y축 반전 필요)
-                // WebGL 텍스처 좌표는 원점이 왼쪽 하단이므로 Y축을 반전
-                const uvX = relativeX;
-                const uvY = 1.0 - relativeY; // Y축 반전
-
-                // 현재 인덱스 위치에 값 직접 설정
-                const idx = currentBiteIndex % MAX_BITES;
-
-                bitePositions[idx * 2] = uvX;
-                bitePositions[idx * 2 + 1] = uvY;
-                biteIntensities[idx] = MIN_PRESS_INTENSITY;
-                biteRotations[idx] = Math.random() * Math.PI * 2;
-
-                if (biteCount < MAX_BITES) biteCount++;
-                currentPressIndex = idx;
-                currentBiteIndex++;
-
-                // 유니폼 업데이트
-                simplePlane.uniforms.bitePositions.value = bitePositions;
-                simplePlane.uniforms.biteIntensities.value = biteIntensities;
-                simplePlane.uniforms.biteRotations.value = biteRotations;
-                simplePlane.uniforms.biteCount.value = biteCount;
-            }
-
-            // 마우스 업 이벤트 핸들러
-            function handleMouseUp(e) {
-                if (!isMouseDown) return;
-
-                isMouseDown = false;
-                const pressDuration = Date.now() - pressStartTime;
-
-                // 최종 intensity 업데이트
-                updateBiteIntensity(simplePlane, currentPressIndex, pressDuration);
-
-                currentPressIndex = -1;
-            }
-
-            // 이벤트 리스너 등록 (전체 document에 등록하여 모든 영역에서 감지)
-            document.addEventListener("mousedown", handleMouseDown);
-            document.addEventListener("mouseup", handleMouseUp);
-            document.addEventListener("touchstart", handleMouseDown);
-            document.addEventListener("touchend", handleMouseUp);
-
-            // HTML 요소 관련 기능 초기화
-            initHTMLFeatures();
-
-        }).onRender(() => {
-            // 시간 업데이트
-            simplePlane.uniforms.time.value++;
-
-            // 마우스를 누르고 있는 동안 intensity를 실시간 업데이트
-            if (isMouseDown && currentPressIndex >= 0) {
-                const pressDuration = Date.now() - pressStartTime;
-                updateBiteIntensity(simplePlane, currentPressIndex, pressDuration);
-            }
-
-        }).onAfterResize(() => {
-            // 미디어 비율에 맞춰 plane 크기 재조정
-            const planeElement = planeElements[0];
-            const media = planeElement.querySelector('img[data-sampler="uSampler0"]') ||
-                         planeElement.querySelector('video[data-sampler="uSampler0"]');
-
-            if (media) {
-                const isVideo = media.tagName === 'VIDEO';
-                const isLoaded = isVideo ?
-                                (media.videoWidth > 0) :
-                                (media.naturalWidth > 0);
-
-                if (isLoaded) {
-                    adjustPlaneSize(planeElement, media);
-                }
-            }
-
-            const planeBoundingRect = simplePlane.getBoundingRect();
-            simplePlane.uniforms.resolution.value = [planeBoundingRect.width, planeBoundingRect.height];
-        }).onError(() => {
-            document.body.classList.add("no-curtains");
-        });
-    }
 
     // HTML 요소 관련 기능 초기화 함수
     function initHTMLFeatures() {
         initSmoothScroll();
         initTeethScrollbar();
-        
-        // 리사이즈 핸들러
-        window.addEventListener('resize', () => {
-            if (!curtains) return;
-            
-            // plane의 resolution 업데이트는 onAfterResize에서 처리됨
-        });
+        initHeaderTabs();
+        initHomeReveal();
+        initStoryScroll();
+        initProductSection();
+        initContactCredit();
     }
 
     // 부드러운 스크롤 초기화 (커스텀 구현)
