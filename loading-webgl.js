@@ -296,6 +296,20 @@ export class LoadingPlane {
         return this;
     }
 
+    onAfterResize(callback) {
+        this.onAfterResizeCallback = callback;
+        window.addEventListener('resize', () => {
+            this._resize();
+            if (callback) callback();
+        });
+        return this;
+    }
+
+    onError(callback) {
+        this.onErrorCallback = callback;
+        return this;
+    }
+
     remove() {
         if (this.animationId) {
             cancelAnimationFrame(this.animationId);
