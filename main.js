@@ -278,9 +278,9 @@ window.addEventListener("load", () => {
             };
             
             // 이빨 자국 데이터
-            const loadingBitePositions = new Float32Array(MAX_BITES * 2);
-            const loadingBiteIntensities = new Float32Array(MAX_BITES);
-            const loadingBiteRotations = new Float32Array(MAX_BITES);
+            const loadingBitePositions = new Float32Array(CONSTANTS.MAX_BITES * 2);
+            const loadingBiteIntensities = new Float32Array(CONSTANTS.MAX_BITES);
+            const loadingBiteRotations = new Float32Array(CONSTANTS.MAX_BITES);
             let loadingBiteCount = 0;
             
             // Plane 파라미터 (현재 쉐이더 구조에 맞춤)
@@ -402,7 +402,7 @@ window.addEventListener("load", () => {
                     // 처음 클릭 시에만 bite 초기화
                     loadingBitePositions[0] = 0.5;
                     loadingBitePositions[1] = 0.5;
-                    loadingBiteIntensities[0] = MIN_PRESS_INTENSITY;
+                    loadingBiteIntensities[0] = CONSTANTS.MIN_PRESS_INTENSITY;
                     loadingBiteRotations[0] = 0;
                     loadingBiteCount = 1;  // 항상 1개만 유지
                     
@@ -419,7 +419,7 @@ window.addEventListener("load", () => {
                     }
                 } else {
                     // 이미 존재하는 bite를 재사용 - intensity만 리셋
-                    loadingBiteIntensities[0] = MIN_PRESS_INTENSITY;
+                    loadingBiteIntensities[0] = CONSTANTS.MIN_PRESS_INTENSITY;
                 }
                 
                 isPressing = true;
