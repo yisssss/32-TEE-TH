@@ -285,7 +285,7 @@ body *:lang(en),
 /* 챕터 표시 (타이틀 바로 아래 중앙) */
 .story-chapter-indicator {
   position: absolute;
-  top: 10vh;
+  top: 6vh;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -293,11 +293,11 @@ body *:lang(en),
 
 .story-chapter-indicator span {
   font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: var(--red);
   text-align: center;
   user-select: none;
-  -webkit-text-stroke-width: 0.5px;
+  -webkit-text-stroke: 0.8px;
 }
 
 /* Story 콘텐츠 그리드 (3x2) */
@@ -380,7 +380,12 @@ body *:lang(en),
 
 /* Story 영문 내용 letter-spacing */
 .story-item p:not(.korean-body-text) {
-  letter-spacing: 0;
+  letter-spacing: 0px;
+  word-break: normal;
+}
+.story-item .korean-body-text {
+  letter-spacing: 0px;
+  -webkit-text-stroke-width: 0.2px;
   word-break: normal;
 }
 
@@ -809,7 +814,7 @@ position: fixed; /* 스크롤에 따라 움직이지 않도록 고정 */
 .home-middle-left,
 .home-middle-right {
   font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   color: var(--black);
   user-select: none;
 }
@@ -849,6 +854,18 @@ position: fixed; /* 스크롤에 따라 움직이지 않도록 고정 */
   user-select: none;
   white-space: normal; /* br 태그 작동하도록 */
   -webkit-text-stroke-width: 0.3px !important;
+}
+
+.home-footer{
+  position: absolute;
+  bottom: 5%;
+  left: 50%;
+  transform:translateX(-50%);
+  z-index: 1;
+  color: var(--red);
+  text-align: center;
+  user-select: none;
+  white-space: normal; /* br 태그 작동하도록 */
 }
 
 /* ============================================
@@ -1014,6 +1031,7 @@ position: fixed; /* 스크롤에 따라 움직이지 않도록 고정 */
   border-top: 2px solid var(--black);
   overflow: hidden;
   position: relative;
+
 }
 
 .product-item::before {
@@ -1027,6 +1045,7 @@ position: fixed; /* 스크롤에 따라 움직이지 않도록 고정 */
   transition: height 0.4s ease;
   z-index: -1;
 }
+
 
 .product-item:hover:not(.active)::before {
   height: 100%;
@@ -1047,12 +1066,25 @@ position: fixed; /* 스크롤에 따라 움직이지 않도록 고정 */
   transition: opacity 0.3s ease;
 }
 
+.product-title:hover{
+    color: var(--red);
+}
+
+/* When hovering a product title, make its inner texts red */
+.product-title:hover .product-name-en,
+.product-title:hover .product-name-ko,
+.product-title:hover .product-info-brief,
+.product-title:hover .product-toggle {
+  color: var(--red) !important;
+}
+
 .product-name-en {
   font-family: 'NeueHaasDisplayMedium', 'HYGothic', sans-serif;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   color: var(--black);
   letter-spacing: -0.01em;
   text-align: left;
+  transition: color 0.25s ease;
 }
 
 .product-name-ko {
@@ -1060,7 +1092,9 @@ position: fixed; /* 스크롤에 따라 움직이지 않도록 고정 */
   font-size: 1.2rem;
   color: var(--black);
   text-align: center;
-  -webkit-text-stroke-width: 1px;
+  transition: color 0.25s ease;
+  -webkit-text-stroke-width: 0.9px;
+  letter-spacing: -0.02em;
 }
 
 /* 오른쪽 칸 컨테이너 (정보 + toggle 버튼) */
@@ -1078,13 +1112,14 @@ position: fixed; /* 스크롤에 따라 움직이지 않도록 고정 */
   text-align: right;
   white-space: pre;
   word-spacing: 1rem;
+  transition: color 0.25s ease;
 }
 
 .product-toggle {
   font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
   font-size: 2rem;
   color: var(--black);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, color 0.25s ease;
   flex-shrink: 0; /* toggle 버튼 크기 고정 */
 }
 
@@ -1177,7 +1212,8 @@ position: fixed; /* 스크롤에 따라 움직이지 않도록 고정 */
 .product-description h3,
 .product-specs h3,
 .product-nutrition h3 {
-  font-family: 'NeueHaasDisplayMedium', 'HYGothic', sans-serif;
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  -webkit-text-stroke-width: 0.4px;
   font-size: 1.2rem;
   color: var(--black);
   margin: 0 0 1rem 0;
@@ -1194,9 +1230,10 @@ position: fixed; /* 스크롤에 따라 움직이지 않도록 고정 */
   font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
   font-size: 0.8rem !important;
   line-height: 1.6;
+  letter-spacing: 0;
   color: var(--black);
   margin: 0;
-  padding: 0;
+  padding: 0; 
 }
 
 .product-specs .spec-item,
@@ -1205,6 +1242,12 @@ position: fixed; /* 스크롤에 따라 움직이지 않도록 고정 */
   justify-content: space-between;
   padding: 0.25rem 0;
   border-bottom: 1px solid rgba(45, 4, 8, 0.1);
+}
+
+/* 한글 텍스트에만 얇은 외곽선 적용 (specs / nutrition 항목) */
+.product-info-brief,.product-specs .spec-item :lang(ko),
+.product-nutrition .nutrition-item :lang(ko) {
+  -webkit-text-stroke-width: 0.3px;
 }
 
 .product-specs .spec-item:last-child,
@@ -1497,6 +1540,8 @@ position: fixed; /* 스크롤에 따라 움직이지 않도록 고정 */
   font-family: 'NeueHaasDisplayRoman', sans-serif;
   font-size: 0.8rem !important;
   text-align: left;
+    -webkit-text-stroke-width: 0.3px !important;
+
 }
 
 /* Contact AI 이미지 안내 텍스트 (왼쪽 하단) */
