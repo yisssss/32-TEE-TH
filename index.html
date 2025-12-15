@@ -9,6 +9,8 @@
     <!-- GSAP CDN -->
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <!-- html2canvas for screenshot -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 
 <body>
@@ -41,7 +43,7 @@
         <!-- 텍스트 (plane과 분리) -->
         <div class="loading-instruction-grid" id="loading-instruction-grid">
             <div class="loading-instruction-left"></div>
-            <div class="loading-instruction-center">PRESS</br>TO</br>BITE</div>
+            <div class="loading-instruction-center">CLICK</br>TO</br>OPEN</div>
             <div class="loading-instruction-right"></div>
         </div>
         <div class="loading-percentage-grid" id="loading-percentage-grid" style="display: none;">
@@ -162,6 +164,22 @@
             </div>
         </div>
 
+        <!-- Slogan 섹션 -->
+        <div class="section" id="slogan">
+            <div class="slogan-container">
+                <div class="slogan-text-en">
+                    <div class="slogan-line">32 TEE TH EATS TO</div>
+                    <div class="slogan-line">NO LONGER LOSE</div>
+                    <div class="slogan-line">WHAT HUMANS POSSESS</div>
+                </div>
+                <div class="slogan-text-ko">
+                    <div class="slogan-line">써티 투 티쓰는</div>
+                    <div class="slogan-line">더이상 인류가 가진 것을</div>
+                    <div class="slogan-line">상실하지 않기 위해 먹는다</div>
+                </div>
+            </div>
+        </div>
+
         <div class="section" id="product">
             <div class="product-container">
                 <!-- 상단 타이틀 (3단 구조) -->
@@ -217,7 +235,7 @@
                     <!-- 4단: 왼쪽 콘텐츠 -->
                     <div class="contact-item" id="contact-content-left">
                         <h3>LINK</h3>
-                        <p>↗Instagram</p>
+                        <l>↗Instagram</l>
                     </div>
                     <!-- 5단: 중앙 콘텐츠 -->
                     <div class="contact-item" id="contact-content-center">
@@ -227,16 +245,22 @@
                     <!-- 6단: 오른쪽 콘텐츠 -->
                     <div class="contact-item" id="contact-content-right">
                         <h3>ADDRESS</h3>
-                        <p>+82 (0)3 2432 2432<br>
-                            mail@theraw.studio<br>32 Marunnae-ro, Jung-gu, Seoul, 102</p>
+                        <l>+82 (0)3 2432 2432<br>
+                            mail@theraw.studio<br>32 Marunnae-ro, Jung-gu, Seoul, 102</l>
                     </div>
                 </div>
                 
                 <!-- Contact 하단 텍스트 -->
                 <div class="contact-footer-text">
-                    <div class="contact-copyright">Date 2025.11.<br>
-                        Copyright © 2025 STUDIO THE RAW.<br>
-                        All Rights Reserved.</div>
+                    <div class="contact-footer-left">
+                        <div class="contact-copyright">Date 2025.11.<br>
+                            Copyright © 2025 STUDIO THE RAW.<br>
+                            All Rights Reserved.</div>
+                        <!-- AI 이미지 안내 텍스트 -->
+                        <div class="contact-ai-notice">
+                            본 브랜드 웹사이트에 수록된 이미지 중 일부는 </br>프로젝트의 연출 의도를 돕기 위해 생성형 AI를 </br>활용하여 제작된 시뮬레이션 이미지이며,  </br>그 외 모든 제품 및 패키지 사진은 실물을 기반으로 촬영되었습니다.
+                        </div>
+                    </div>
                     <div class="contact-credit-wrapper">
                         <div class="contact-credit" id="contact-credit">CREDIT</div>
                         <!-- Credit 패널 -->
@@ -247,6 +271,7 @@
                         </div>
                     </div>
                 </div>
+                
                 
             </div>
         </div>
