@@ -98,7 +98,6 @@ p:lang(ko) {
   font-size: 1.2rem;
   line-height: 2rem;
   letter-spacing: -0.05em;
-  transform: scaleX(0.97);
   -webkit-text-stroke-width: 0.1px;
 }
 
@@ -206,25 +205,34 @@ body *:lang(en),
   flex-direction: column;
   font-family: 'NeueHaasDisplayMedium', 'HYGothic', sans-serif;
   font-size: 60pt;
-  line-height: 0.7;
   color: var(--red);
   letter-spacing: -0.02em;
   user-select: none;
+  gap: 0; /* gap 제거하고 margin으로 간격 조정 */
 }
 
 .slogan-text-ko {
   font-family: 'HYGothic', 'NeueHaasDisplayMedium', sans-serif;
   font-size: 54pt;
-  line-height: 0.8;
-
+  line-height: 1.4;
   -webkit-text-stroke-width: 4.5px;
   letter-spacing: -0.05em;
 
 }
 
 .slogan-line {
-  overflow: hidden;
+  overflow: visible; /* 글자 잘림 방지 */
   position: relative;
+  margin-top: -0.44em; /* 줄 간격 줄이기 */
+  margin-bottom: -0.15em;
+}
+
+.slogan-line:first-child {
+  margin-top: 0; /* 첫 번째 줄은 위쪽 마진 없음 */
+}
+
+.slogan-line:last-child {
+  margin-bottom: 0; /* 마지막 줄은 아래쪽 마진 없음 */
 }
 
 /* Story 전용 컨테이너 */
@@ -467,17 +475,17 @@ body *:lang(en),
   object-fit: cover;
 }
 
-/* ✅ 로딩 이미지 컨테이너 (정중앙, 원본 사이즈) */
+/* ✅ 로딩 이미지 컨테이너 (화면 전체를 채움) */
 #loading-image-container {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: auto; /* JavaScript에서 동적으로 설정 */
-  height: auto; /* JavaScript에서 동적으로 설정 */
+  top: 0;
+  left: 0;
+  width: 100vw; /* 화면 전체 너비 */
+  height: 100vh; /* 화면 전체 높이 */
   user-select: none;
   pointer-events: none;
   z-index: 10002;
+  overflow: hidden; /* 넘치는 부분은 숨김 */
 }
 
 /* ✅ 로딩 인스트럭션 그리드 (Home 타이틀과 동일한 3단 구조) */
@@ -574,6 +582,20 @@ body *:lang(en),
   color: var(--red);
   letter-spacing: -0.02em;
 }
+
+/* Message shown above the numeric percentage when progress > 0 */
+.loading-percentage-message {
+  display: none; /* shown via JS when progress > 0 */
+  font-family: 'NeueHaasDisplayRoman', 'HYGothic', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.2px;
+  color: var(--red);
+  line-height: 1;
+  user-select: none;
+  margin-bottom: 18px;
+}
+
+/* numeric element uses parent's sizing */
 
 .loading-percentage-right {
   text-align: right;

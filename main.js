@@ -25,7 +25,7 @@ const CONSTANTS = {
         MAX_BLUR: 12,                  // 셰이더의 MAX_BLUR 상수
         
         // 고정 값
-        distortionStrength: 0.6,        // 왜곡 강도
+        distortionStrength: 0.4,        // 왜곡 강도
         dilation: 0.02,                 // 확장
         highlightIntensity: 0.3,        // 하이라이트 강도
         shadowIntensity: 0.5,           // 그림자 강도
@@ -46,7 +46,7 @@ const CONSTANTS = {
         },
         edgeSoftness: {
             min: 2.0,                   // 최소값 (progress 0%)
-            max: 5.0,                   // 최대값 (progress 100%)
+            max: 6.0,                   // 최대값 (progress 100%)
         },
     },
     
@@ -79,7 +79,9 @@ window.addEventListener("load", () => {
     const loadingPage = document.getElementById('loading-page');
     const loadingInstructionGrid = document.getElementById('loading-instruction-grid');
     const loadingPercentageGrid = document.getElementById('loading-percentage-grid');
-    const loadingPercentageCenter = loadingPercentageGrid ? loadingPercentageGrid.querySelector('.loading-percentage-number') : null;
+    const loadingPercentageCenter = loadingPercentageGrid ? loadingPercentageGrid.querySelector('.loading-percentage-center') : null;
+    const loadingPercentageNumber = loadingPercentageCenter ? loadingPercentageCenter.querySelector('.loading-percentage-number') : null;
+    const loadingPercentageMessage = loadingPercentageCenter ? loadingPercentageCenter.querySelector('.loading-percentage-message') : null;
     const pageContent = document.getElementById('page-content');
     const teethScrollbar = document.getElementById('teeth-scrollbar');
 
@@ -241,78 +243,16 @@ window.addEventListener("load", () => {
         const setupPlaneWithImageSize = () => {
             console.log('🖼️ setupPlaneWithImageSize 시작...');
             
-            // loading.png 이미지 가져오기 (비율 계산용)
-            const biteTextureImg = loadingImageContainer.querySelector('img[data-sampler="uBiteTexture"]');
+            // 배경 이미지는 화면 전체를 채워야 함 (cover 방식)
+            // loading.png는 shader의 왜곡 텍스처로만 사용되므로 plane 크기와는 무관
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
             
-            // 배경 이미지 크기
-            const bgImgWidth = backgroundImg.naturalWidth || backgroundImg.width;
-            const bgImgHeight = backgroundImg.naturalHeight || backgroundImg.height;
+            // 컨테이너 크기를 화면 전체로 설정 (배경 이미지가 화면을 가득 채움)
+            loadingImageContainer.style.width = screenWidth + 'px';
+            loadingImageContainer.style.height = screenHeight + 'px';
             
-            // loading.png 이미지 비율에 맞춰 컨테이너 크기 설정
-            let containerWidth = bgImgWidth;
-            let containerHeight = bgImgHeight;
-            
-            // loading.png 이미지가 로드되었는지 확인하고 비율 적용
-            if (biteTextureImg) {
-                const checkBiteImage = () => {
-                    const biteWidth = biteTextureImg.naturalWidth || biteTextureImg.width;
-                    const biteHeight = biteTextureImg.naturalHeight || biteTextureImg.height;
-                    
-                    if (biteWidth > 0 && biteHeight > 0) {
-                        // loading.png의 비율 계산
-                        const biteAspectRatio = biteWidth / biteHeight;
-                        
-                        // loading.png 비율에 맞춰 컨테이너 크기 조정
-                        // 화면 크기에 맞춰 적절한 너비 설정 (배경 이미지 너비 또는 화면 너비의 80%)
-                        const maxWidth = Math.min(bgImgWidth || 1920, window.innerWidth * 0.9);
-                        containerWidth = maxWidth;
-                        containerHeight = containerWidth / biteAspectRatio;
-                        
-                        // 컨테이너 크기 설정
-                        if (containerWidth > 0 && containerHeight > 0) {
-                            loadingImageContainer.style.width = containerWidth + 'px';
-                            loadingImageContainer.style.height = containerHeight + 'px';
-                            console.log(`✅ loading.png 비율 반영: ${containerWidth}x${containerHeight} (비율: ${biteAspectRatio.toFixed(2)}, 원본: ${biteWidth}x${biteHeight})`);
-                        }
-                    } else {
-                        // 이미지가 아직 로드되지 않았으면 기본값 사용
-                        if (containerWidth === 0 || containerHeight === 0) {
-                            loadingImageContainer.style.width = '800px';
-                            loadingImageContainer.style.height = '800px';
-                        } else {
-                            loadingImageContainer.style.width = containerWidth + 'px';
-                            loadingImageContainer.style.height = containerHeight + 'px';
-                        }
-                    }
-                };
-                
-                // 이미지가 이미 로드되었는지 확인
-                if (biteTextureImg.complete && biteTextureImg.naturalWidth > 0) {
-                    checkBiteImage();
-                } else {
-                    // 이미지 로드 대기
-                    biteTextureImg.addEventListener('load', checkBiteImage, { once: true });
-                    biteTextureImg.addEventListener('error', () => {
-                        // 로드 실패 시 배경 이미지 크기 사용
-                        if (containerWidth === 0 || containerHeight === 0) {
-                            loadingImageContainer.style.width = '800px';
-                            loadingImageContainer.style.height = '800px';
-                        } else {
-                            loadingImageContainer.style.width = containerWidth + 'px';
-                            loadingImageContainer.style.height = containerHeight + 'px';
-                        }
-                    }, { once: true });
-                }
-            } else {
-                // loading.png가 없으면 배경 이미지 크기 사용
-                if (containerWidth === 0 || containerHeight === 0) {
-                    loadingImageContainer.style.width = '800px';
-                    loadingImageContainer.style.height = '800px';
-                } else {
-                    loadingImageContainer.style.width = containerWidth + 'px';
-                    loadingImageContainer.style.height = containerHeight + 'px';
-                }
-            }
+            console.log(`✅ 배경 이미지 컨테이너 크기: ${screenWidth}x${screenHeight} (화면 전체)`);
 
             let pressStartTime = 0;
             let isPressing = false;
@@ -343,8 +283,15 @@ window.addEventListener("load", () => {
                 isPressing = false;
 
                 // percentage 표시 리셋
-                if (loadingPercentageCenter) {
+                if (loadingPercentageNumber) {
+                    loadingPercentageNumber.textContent = '0';
+                } else if (loadingPercentageCenter) {
                     loadingPercentageCenter.textContent = '0';
+                }
+
+                // 메시지 숨기기
+                if (loadingPercentageMessage) {
+                    loadingPercentageMessage.style.display = 'none';
                 }
 
                 // shader plane 숨기기
@@ -381,26 +328,21 @@ window.addEventListener("load", () => {
             const loadingBiteRotations = new Float32Array(CONSTANTS.MAX_BITES);
             let loadingBiteCount = 0;
             
-            // 컨테이너 크기 변수 (나중에 업데이트됨)
-            let finalContainerWidth = bgImgWidth || 800;
-            let finalContainerHeight = bgImgHeight || 800;
+            // 컨테이너 크기 변수 (화면 전체 크기)
+            let finalContainerWidth = window.innerWidth;
+            let finalContainerHeight = window.innerHeight;
             
-            // loading.png 이미지가 로드되면 컨테이너 크기 업데이트
+            // 리사이즈 시 컨테이너 크기 업데이트 (항상 화면 전체 크기)
             const updateContainerSize = () => {
-                const biteTextureImg = loadingImageContainer.querySelector('img[data-sampler="uBiteTexture"]');
+                const newScreenWidth = window.innerWidth;
+                const newScreenHeight = window.innerHeight;
                 
-                if (biteTextureImg && biteTextureImg.complete) {
-                    const biteWidth = biteTextureImg.naturalWidth || biteTextureImg.width;
-                    const biteHeight = biteTextureImg.naturalHeight || biteTextureImg.height;
-                    
-                    if (biteWidth > 0 && biteHeight > 0) {
-                        const biteAspectRatio = biteWidth / biteHeight;
-                        // 화면 크기에 맞춰 적절한 너비 설정
-                        const maxWidth = Math.min(bgImgWidth || 1920, window.innerWidth * 0.9);
-                        finalContainerWidth = maxWidth;
-                        finalContainerHeight = finalContainerWidth / biteAspectRatio;
-                    }
-                }
+                finalContainerWidth = newScreenWidth;
+                finalContainerHeight = newScreenHeight;
+                
+                // 컨테이너 크기 업데이트
+                loadingImageContainer.style.width = finalContainerWidth + 'px';
+                loadingImageContainer.style.height = finalContainerHeight + 'px';
             };
             
             // Plane 파라미터 (현재 쉐이더 구조에 맞춤)
@@ -497,14 +439,12 @@ window.addEventListener("load", () => {
                     loadingImageContainer.style.pointerEvents = 'auto';
                 }
 
-                // 컨테이너 크기 업데이트 (loading.png 비율 반영)
+                // 컨테이너 크기 업데이트 (화면 전체 크기)
                 updateContainerSize();
                 
-                // Plane 크기 확인 및 업데이트 (loading.png 비율 반영된 크기 사용)
-                const planeBoundingRect = loadingPlane.getBoundingRect();
-                // 컨테이너의 실제 크기 사용 (loading.png 비율이 반영된 크기)
-                const finalWidth = parseFloat(loadingImageContainer.style.width) || finalContainerWidth || planeBoundingRect.width;
-                const finalHeight = parseFloat(loadingImageContainer.style.height) || finalContainerHeight || planeBoundingRect.height;
+                // Plane resolution은 화면 크기로 설정 (배경 이미지가 화면을 가득 채움)
+                const finalWidth = window.innerWidth;
+                const finalHeight = window.innerHeight;
                 loadingPlane.uniforms.resolution.value = [finalWidth, finalHeight];
                 
                 onPressStartHandler = function(e) {
@@ -723,16 +663,23 @@ window.addEventListener("load", () => {
                 }
                 
                 // 퍼센티지 표시 (항상 업데이트)
-                if (loadingPercentageCenter) {
-                    loadingPercentageCenter.textContent = Math.round(loadingProgress * 100);
+                const percentText = Math.round(loadingProgress * 100);
+                if (loadingPercentageNumber) {
+                    loadingPercentageNumber.textContent = percentText;
+                } else if (loadingPercentageCenter) {
+                    loadingPercentageCenter.textContent = percentText; // fallback when structure not updated
+                }
+
+                // 메시지 보이기/숨기기: progress > 0이면 표시
+                if (loadingPercentageMessage) {
+                    loadingPercentageMessage.style.display = loadingProgress > 0 ? 'block' : 'none';
                 }
             }).onAfterResize(() => {
-                // 리사이즈 시 plane 크기 업데이트 (loading.png 비율 유지)
+                // 리사이즈 시 plane 크기 업데이트 (화면 전체 크기)
                 updateContainerSize();
-                const planeBoundingRect = loadingPlane.getBoundingRect();
-                // 컨테이너의 실제 크기 사용
-                const finalWidth = parseFloat(loadingImageContainer.style.width) || finalContainerWidth || planeBoundingRect.width;
-                const finalHeight = parseFloat(loadingImageContainer.style.height) || finalContainerHeight || planeBoundingRect.height;
+                // Plane resolution은 항상 화면 크기로 설정
+                const finalWidth = window.innerWidth;
+                const finalHeight = window.innerHeight;
                 loadingPlane.uniforms.resolution.value = [finalWidth, finalHeight];
             }).onError(() => {
                 // 실패 시 HTML features만 초기화
@@ -1914,10 +1861,68 @@ gsap.fromTo(homeBackground,
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && loadingPage && loadingPage.style.display !== 'none') {
             loadingProgress = 1.0;
-            if (loadingPercentageCenter) {
+            if (loadingPercentageNumber) {
+                loadingPercentageNumber.textContent = '100';
+            } else if (loadingPercentageCenter) {
                 loadingPercentageCenter.textContent = '100';
             }
             startMainPage();
+        }
+    });
+
+    // S 키로 전체 화면 고화질 저장
+    window.addEventListener('keydown', async (e) => {
+        // s 키를 누르면 (대소문자 구분 없음)
+        if (e.key === 's' || e.key === 'S') {
+            // 다른 키와의 조합 방지 (Ctrl, Alt, Meta 등과 함께 누르지 않을 때만)
+            if (!e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey) {
+                e.preventDefault();
+                
+                try {
+                    // html2canvas가 로드되었는지 확인
+                    if (typeof window.html2canvas === 'undefined') {
+                        console.error('html2canvas가 로드되지 않았습니다.');
+                        return;
+                    }
+
+                    console.log('📸 화면 캡처 시작...');
+                    
+                    // 고화질로 캡처하기 위해 scale을 높게 설정 (devicePixelRatio의 2배)
+                    const scale = window.devicePixelRatio * 2;
+                    
+                    // 전체 화면 캡처 (body 요소)
+                    const canvas = await window.html2canvas(document.body, {
+                        scale: scale, // 고화질 설정
+                        useCORS: true, // CORS 이미지 허용
+                        logging: false, // 로그 비활성화
+                        backgroundColor: '#ffffff', // 배경색
+                        width: window.innerWidth,
+                        height: document.documentElement.scrollHeight, // 전체 스크롤 높이
+                        windowWidth: window.innerWidth,
+                        windowHeight: window.innerHeight,
+                        scrollX: 0,
+                        scrollY: 0
+                    });
+                    
+                    // Canvas를 이미지로 변환
+                    const imgData = canvas.toDataURL('image/png');
+                    
+                    // 다운로드 링크 생성
+                    const link = document.createElement('a');
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                    link.download = `32-TEE-TH-${timestamp}.png`;
+                    link.href = imgData;
+                    
+                    // 다운로드 실행
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    console.log('✅ 화면 저장 완료!');
+                } catch (error) {
+                    console.error('화면 캡처 실패:', error);
+                }
+            }
         }
     });
 });
